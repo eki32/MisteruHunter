@@ -37,14 +37,14 @@
   max-width: 450px;
   width: 90%;
   text-align: center;
-  box-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
 
   .mystery-logo {
     width: 120px;
     height: auto;
     margin: 0 auto 20px;
     display: block;
-    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));
+    filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.15));
     animation: float 3s ease-in-out infinite;
   }
 
@@ -52,7 +52,7 @@
     color: #ffffff;
     font-size: 2.8rem;
     margin-bottom: 15px;
-    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    text-shadow: 0 0 5px rgba(212, 175, 55, 0.25);
 
     .gold {
       color: #d4af37;
@@ -116,7 +116,7 @@
 
     &:hover {
       background: #f1c40f;
-      box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
       transform: translateY(-2px);
     }
   }
@@ -165,7 +165,7 @@
     &:hover {
       background: rgba(212, 175, 55, 0.2);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.15);
     }
 
     &:active {
@@ -210,7 +210,7 @@
     font-size: 1.3rem;
     margin: 0 0 15px 0;
     text-align: center;
-    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    text-shadow: 0 0 5px rgba(212, 175, 55, 0.25);
   }
 
   .loading {
@@ -264,15 +264,15 @@
         font-size: 1.8rem;
 
         &.gold {
-          filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+          filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.3));
         }
 
         &.silver {
-          filter: drop-shadow(0 0 8px rgba(192, 192, 192, 0.6));
+          filter: drop-shadow(0 0 4px rgba(192, 192, 192, 0.3));
         }
 
         &.bronze {
-          filter: drop-shadow(0 0 8px rgba(205, 127, 50, 0.6));
+          filter: drop-shadow(0 0 4px rgba(205, 127, 50, 0.3));
         }
       }
 
@@ -485,6 +485,63 @@
 
   &:active {
     transform: translateY(0);
+  }
+}
+
+/* ============================================
+   ANIMACIONES DE MARCADORES - OPTIMIZADAS
+   ============================================ */
+
+/* ✅ Marcador base bloqueado (sin animación) */
+.locked-marker-base {
+  /* Sin animación, completamente estático */
+}
+
+/* ✅ Animación SUAVE cuando te acercas */
+.unlockable-marker-gentle {
+  animation: pulse-gentle 2s ease-in-out infinite;
+}
+
+@keyframes pulse-gentle {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+/* ✅ Animación NORMAL cuando estás cerca */
+.unlockable-marker {
+  animation: pulse-unlock 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-unlock {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.85;
+  }
+}
+
+/* ✅ Animación INTENSA cuando estás MUY cerca */
+.very-close-marker {
+  animation: pulse-intense 0.8s ease-in-out infinite;
+}
+
+@keyframes pulse-intense {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 0.75;
   }
 }
 

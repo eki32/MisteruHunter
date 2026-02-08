@@ -250,78 +250,87 @@ export class App {
   }
 
   validarDesdePopup(titulo: string, respuestaUser: string) {
-    const misterio = this.misteriosList.find((m) => m.titulo === titulo);
+  const misterio = this.misteriosList.find((m) => m.titulo === titulo);
 
-    if (!misterio) {
-      alert('Error: Misterio no encontrado');
-      return;
-    }
+  if (!misterio) {
+    alert('Error: Misterio no encontrado');
+    return;
+  }
 
-    console.log('🔍 Validando:');
-    console.log('   Usuario escribió:', respuestaUser.toLowerCase());
-    console.log('   Respuesta correcta:', misterio.respuesta.toLowerCase());
+  console.log('🔍 Validando:');
+  console.log('   Usuario escribió:', respuestaUser.toLowerCase());
+  console.log('   Respuesta correcta:', misterio.respuesta.toLowerCase());
 
-    if (respuestaUser.toLowerCase() === misterio.respuesta.toLowerCase()) {
-      console.log('✅ ¡Respuesta correcta!');
+  if (respuestaUser.toLowerCase() === misterio.respuesta.toLowerCase()) {
+    console.log('✅ ¡Respuesta correcta!');
 
-      this.map.closePopup();
-      misterio.desbloqueado = true;
+    this.map.closePopup();
+    misterio.desbloqueado = true;
 
-      this.ngZone.run(() => {
-        this.solvedMysteryTitle.set(misterio.titulo);
-        this.earnedPoints.set(50);
-        this.showSuccessModal.set(true);
+    this.ngZone.run(() => {
+      this.solvedMysteryTitle.set(misterio.titulo);
+      this.earnedPoints.set(50);
+      this.showSuccessModal.set(true);
 
-        console.log('🎉 Modal activado:', {
-          show: this.showSuccessModal(),
-          title: this.solvedMysteryTitle(),
-          points: this.earnedPoints(),
-        });
-
-        this.totalPoints.update((p) => p + 50);
-        this.cdr.detectChanges();
+      console.log('🎉 Modal activado:', {
+        show: this.showSuccessModal(),
+        title: this.solvedMysteryTitle(),
+        points: this.earnedPoints(),
       });
 
-      const marker = this.markers.get(misterio.id);
-      if (marker && this.L) {
-        const unlockedIcon = this.L.icon({
-          iconUrl: 'assets/unlocked.png',
-          iconSize: [32, 32],
-          iconAnchor: [16, 32],
-        });
+      this.totalPoints.update((p) => p + 50);
+      this.cdr.detectChanges();
+    });
 
-        marker.setIcon(unlockedIcon);
+    const marker = this.markers.get(misterio.id);
+    if (marker && this.L) {
+      const unlockedIcon = this.L.icon({
+        iconUrl: 'assets/unlocked.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+      });
 
-        const popupContent = `
-          <div class="popup-info" style="width: 220px; padding: 10px;">
-            <img src="${misterio.imagen}" style="width: 100%; border-radius: 8px; margin-bottom: 8px;">
-            <h3 style="margin: 0 0 8px 0; color: #d4af37;">${misterio.titulo}</h3>
-            <p style="font-size: 13px; line-height: 1.4; margin: 0;">${misterio.descripcion}</p>
-          </div>`;
-        marker.bindPopup(popupContent);
-      }
+      marker.setIcon(unlockedIcon);
 
-      Promise.all([
-        this.mysteryService.unlockMystery(this.userId, misterio.id),
-        this.mysteryService.addPoints(this.userId, 50),
-      ])
-        .then(() => {
-          console.log('✅ Progreso guardado en Firebase');
-          this.loadRanking();
-        })
-        .catch((err) => {
-          console.error('❌ Error al guardar:', err);
-        });
-    } else {
-      console.log('❌ Respuesta incorrecta');
-      alert('Respuesta incorrecta. ¡Sigue intentándolo!');
-      const inputElement = document.getElementById(`ans-${titulo}`) as HTMLInputElement;
-      if (inputElement) {
-        inputElement.value = '';
-        inputElement.focus();
-      }
+      // ✅ OPTIMIZADO: Popup con imagen lazy loading y placeholder
+      const popupContent = `
+        <div class="popup-info" style="width: 220px; padding: 10px;">
+          <div style="width: 100%; height: 120px; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+            <div style="position: absolute; color: #d4af37; font-size: 32px;">🔓</div>
+            <img src="${misterio.imagen}" 
+                 loading="lazy"
+                 style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.3s;"
+                 onload="this.style.opacity='1'"
+                 onerror="this.style.display='none'"
+                 alt="${misterio.titulo}">
+          </div>
+          <h3 style="margin: 0 0 8px 0; color: #d4af37;">${misterio.titulo}</h3>
+          <p style="font-size: 13px; line-height: 1.4; margin: 0;">${misterio.descripcion}</p>
+        </div>`;
+      marker.bindPopup(popupContent);
+    }
+
+    Promise.all([
+      this.mysteryService.unlockMystery(this.userId, misterio.id),
+      this.mysteryService.addPoints(this.userId, 50),
+    ])
+      .then(() => {
+        console.log('✅ Progreso guardado en Firebase');
+        this.loadRanking();
+      })
+      .catch((err) => {
+        console.error('❌ Error al guardar:', err);
+      });
+  } else {
+    console.log('❌ Respuesta incorrecta');
+    alert('Respuesta incorrecta. ¡Sigue intentándolo!');
+    const inputElement = document.getElementById(`ans-${titulo}`) as HTMLInputElement;
+    if (inputElement) {
+      inputElement.value = '';
+      inputElement.focus();
     }
   }
+}
 
   closeSuccessModal() {
     this.showSuccessModal.set(false);
@@ -563,67 +572,76 @@ private stopLocationTracking() {
   }
 
   loadMysteries(L: any) {
-    if (!this.map) {
-      console.error('❌ El mapa no está inicializado');
-      return;
-    }
+  if (!this.map) {
+    console.error('❌ El mapa no está inicializado');
+    return;
+  }
 
-    const lockedIcon = L.icon({
-      iconUrl: 'assets/locked.png',
-      iconSize: [32, 32],
-      iconAnchor: [16, 32],
+  const lockedIcon = L.icon({
+    iconUrl: 'assets/locked.png',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+  });
+
+  const unlockedIcon = L.icon({
+    iconUrl: 'assets/unlocked.png',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+  });
+
+  this.mysteryService.getMysteries().subscribe((misterios) => {
+    console.log('📦 Misterios cargados:', misterios);
+
+    this.misteriosList = misterios.map((m) => ({
+      ...m,
+      desbloqueado: this.userProgress.unlockedMysteries.includes(m.id),
+    }));
+
+    this.markers.forEach((marker) => {
+      this.map.removeLayer(marker);
     });
+    this.markers.clear();
 
-    const unlockedIcon = L.icon({
-      iconUrl: 'assets/unlocked.png',
-      iconSize: [32, 32],
-      iconAnchor: [16, 32],
-    });
+    this.misteriosList.forEach((m) => {
+      console.log(`${m.titulo} - Desbloqueado: ${m.desbloqueado} - Radio: ${m.radioDesbloqueo}m - Pos: (${m.latitud}, ${m.longitud})`);
 
-    this.mysteryService.getMysteries().subscribe((misterios) => {
-      console.log('📦 Misterios cargados:', misterios);
+      const mysteryPos = L.latLng(m.latitud, m.longitud);
+      const initialIcon = m.desbloqueado ? unlockedIcon : lockedIcon;
+      const marker = L.marker(mysteryPos, { icon: initialIcon }).addTo(this.map);
 
-      this.misteriosList = misterios.map((m) => ({
-        ...m,
-        desbloqueado: this.userProgress.unlockedMysteries.includes(m.id),
-      }));
+      this.markers.set(m.id, marker);
 
-      this.markers.forEach((marker) => {
-        this.map.removeLayer(marker);
-      });
-      this.markers.clear();
-
-      this.misteriosList.forEach((m) => {
-        console.log(`${m.titulo} - Desbloqueado: ${m.desbloqueado} - Radio: ${m.radioDesbloqueo}m - Pos: (${m.latitud}, ${m.longitud})`);
-
-        const mysteryPos = L.latLng(m.latitud, m.longitud);
-        const initialIcon = m.desbloqueado ? unlockedIcon : lockedIcon;
-        const marker = L.marker(mysteryPos, { icon: initialIcon }).addTo(this.map);
-
-        this.markers.set(m.id, marker);
-
-        if (m.desbloqueado) {
-          const popupContent = `
-            <div class="popup-info" style="width: 220px; padding: 10px;">
-              <img src="${m.imagen}" style="width: 100%; border-radius: 8px; margin-bottom: 8px;" alt="${m.titulo}">
-              <h3 style="margin: 0 0 8px 0; color: #d4af37;">${m.titulo}</h3>
-              <p style="font-size: 13px; line-height: 1.4; margin: 0;">${m.descripcion}</p>
-            </div>`;
-          marker.bindPopup(popupContent);
-        } else {
-          marker.bindPopup(`
-            <div style="text-align: center; padding: 10px;">
-              <b>🔒 Bloqueado</b><br>
-              <span style="font-size: 12px;">Acércate a ${m.radioDesbloqueo || 50}m para desbloquear</span>
-            </div>`);
-        }
-      });
-
-      if (this.playerMarker) {
-        const userLocation = this.playerMarker.getLatLng();
-        console.log('🔄 Actualizando distancias iniciales desde:', userLocation);
-        this.updateMysteriesDistance(userLocation);
+      if (m.desbloqueado) {
+        // ✅ OPTIMIZADO: Popup con imagen lazy loading y placeholder
+        const popupContent = `
+          <div class="popup-info" style="width: 220px; padding: 10px;">
+            <div style="width: 100%; height: 120px; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+              <div style="position: absolute; color: #d4af37; font-size: 32px;">🔓</div>
+              <img src="${m.imagen}" 
+                   loading="lazy"
+                   style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top: 0; left: 0;"
+                   onload="this.style.opacity='1'"
+                   onerror="this.style.display='none'"
+                   alt="${m.titulo}">
+            </div>
+            <h3 style="margin: 0 0 8px 0; color: #d4af37;">${m.titulo}</h3>
+            <p style="font-size: 13px; line-height: 1.4; margin: 0;">${m.descripcion}</p>
+          </div>`;
+        marker.bindPopup(popupContent);
+      } else {
+        marker.bindPopup(`
+          <div style="text-align: center; padding: 10px;">
+            <b>🔒 Bloqueado</b><br>
+            <span style="font-size: 12px;">Acércate a ${m.radioDesbloqueo || 50}m para desbloquear</span>
+          </div>`);
       }
     });
-  }
+
+    if (this.playerMarker) {
+      const userLocation = this.playerMarker.getLatLng();
+      console.log('🔄 Actualizando distancias iniciales desde:', userLocation);
+      this.updateMysteriesDistance(userLocation);
+    }
+  });
+}
 }
