@@ -1,0 +1,648 @@
+/* Estilos del Componente Principal */
+
+.score-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  background: rgba(26, 26, 26, 0.9);
+  color: #d4af37;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border: 2px solid #d4af37;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.welcome-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+
+.welcome-card {
+  background: #1a1a1a;
+  border: 3px solid #d4af37;
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 450px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
+
+  .mystery-title {
+    color: #ffffff;
+    font-size: 2.8rem;
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    
+    .gold { color: #d4af37; }
+  }
+
+  .description-box {
+    color: #e0e0e0;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin: 20px 0;
+    
+    p { margin-bottom: 15px; }
+    
+    ul {
+      text-align: left;
+      padding-left: 20px;
+      li {
+        margin-bottom: 8px;
+        list-style: "✨ ";
+      }
+    }
+  }
+
+  .start-button {
+    background: #d4af37;
+    color: #1a1a1a;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    border-radius: 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: #f1c40f;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+/* ============================================
+   RANKING DESPLEGABLE
+   ============================================ */
+
+.ranking-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 10000;
+  transition: all 0.3s ease;
+
+  .ranking-toggle {
+    background: rgba(26, 26, 26, 0.95);
+    border: 2px solid #d4af37;
+    color: #d4af37;
+    padding: 10px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+
+    .icon {
+      font-size: 1.3rem;
+    }
+
+    &:hover {
+      background: rgba(212, 175, 55, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  .ranking-content {
+    background: rgba(26, 26, 26, 0.98);
+    border: 2px solid #d4af37;
+    border-radius: 12px;
+    margin-top: 10px;
+    padding: 15px;
+    min-width: 320px;
+    max-width: 380px;
+    max-height: 500px;
+    overflow-y: auto;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+    animation: slideDown 0.3s ease;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #d4af37;
+      border-radius: 4px;
+
+      &:hover {
+        background: #f1c40f;
+      }
+    }
+  }
+
+  .ranking-title {
+    color: #d4af37;
+    font-size: 1.3rem;
+    margin: 0 0 15px 0;
+    text-align: center;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+  }
+
+  .loading {
+    text-align: center;
+    color: #d4af37;
+    padding: 20px;
+    font-size: 0.95rem;
+  }
+
+  .no-players {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    font-size: 0.9rem;
+  }
+
+  .players-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .player-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateX(3px);
+    }
+
+    &.current-user {
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+
+      &:hover {
+        background: rgba(212, 175, 55, 0.2);
+      }
+    }
+
+    .rank {
+      min-width: 40px;
+      text-align: center;
+
+      .medal {
+        font-size: 1.8rem;
+        
+        &.gold {
+          filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+        }
+
+        &.silver {
+          filter: drop-shadow(0 0 8px rgba(192, 192, 192, 0.6));
+        }
+
+        &.bronze {
+          filter: drop-shadow(0 0 8px rgba(205, 127, 50, 0.6));
+        }
+      }
+
+      .position {
+        color: #d4af37;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+    }
+
+    .player-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .player-name {
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        .you-badge {
+          background: #d4af37;
+          color: #1a1a1a;
+          font-size: 0.7rem;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-weight: 800;
+        }
+      }
+
+      .mysteries-count {
+        color: #888;
+        font-size: 0.8rem;
+      }
+    }
+
+    .player-points {
+      color: #d4af37;
+      font-weight: bold;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: baseline;
+      gap: 3px;
+
+      .pts {
+        font-size: 0.75rem;
+        color: #999;
+      }
+    }
+  }
+
+  .user-position {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(212, 175, 55, 0.3);
+
+    .separator {
+      text-align: center;
+      color: #666;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   MEDIA QUERIES - WELCOME CARD RESPONSIVE
+   ============================================ */
+
+/* Teléfonos plegables pequeños (hasta 350px) */
+@media (max-width: 350px) {
+  .score-container {
+    top: 10px;
+    right: 10px;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+  }
+
+  .welcome-card {
+    padding: 20px;
+    width: 95%;
+    border-width: 2px;
+
+    .mystery-title {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+
+    .description-box {
+      font-size: 0.85rem;
+      margin: 15px 0;
+
+      p {
+        margin-bottom: 10px;
+      }
+
+      ul {
+        padding-left: 15px;
+        li {
+          margin-bottom: 6px;
+        }
+      }
+    }
+
+    .start-button {
+      padding: 12px 30px;
+      font-size: 0.9rem;
+    }
+  }
+
+  .ranking-container {
+    right: 10px;
+    top: 60px;
+
+    .ranking-toggle {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+
+      .icon {
+        font-size: 1.1rem;
+      }
+    }
+
+    .ranking-content {
+      min-width: 280px;
+      max-width: calc(100vw - 20px);
+      padding: 12px;
+      max-height: 400px;
+    }
+
+    .ranking-title {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+
+    .player-item {
+      padding: 10px;
+      gap: 10px;
+
+      .rank .medal {
+        font-size: 1.5rem;
+      }
+
+      .rank .position {
+        font-size: 1rem;
+      }
+
+      .player-info .player-name {
+        font-size: 0.85rem;
+      }
+
+      .player-info .mysteries-count {
+        font-size: 0.75rem;
+      }
+
+      .player-points {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+/* Teléfonos pequeños (351px - 480px) */
+@media (min-width: 351px) and (max-width: 480px) {
+  .score-container {
+    top: 12px;
+    right: 12px;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+  }
+
+  .welcome-card {
+    padding: 25px;
+    width: 92%;
+
+    .mystery-title {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    .description-box {
+      font-size: 0.9rem;
+      margin: 18px 0;
+
+      p {
+        margin-bottom: 12px;
+      }
+    }
+
+    .start-button {
+      padding: 13px 35px;
+      font-size: 0.95rem;
+    }
+  }
+
+  .ranking-container {
+    top: 70px;
+
+    .ranking-toggle {
+      font-size: 0.9rem;
+    }
+
+    .ranking-content {
+      min-width: 300px;
+      max-height: 450px;
+    }
+  }
+}
+
+/* Samsung específico (360x740 y similares) */
+@media (min-width: 360px) and (max-width: 375px) and (min-height: 640px) and (max-height: 812px) {
+  .ranking-container {
+    top: 70px;
+
+    .ranking-toggle {
+      padding: 8px 14px;
+      font-size: 0.85rem;
+
+      .icon {
+        font-size: 1.1rem;
+      }
+    }
+
+    .ranking-content {
+      min-width: 280px;
+      max-width: 320px;
+    }
+
+    .ranking-title {
+      font-size: 1.15rem;
+    }
+  }
+}
+
+/* Teléfonos estándar (481px - 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+  .score-container {
+    top: 15px;
+    right: 15px;
+    padding: 10px 18px;
+    font-size: 1rem;
+  }
+
+  .welcome-card {
+    padding: 30px;
+    max-width: 400px;
+
+    .mystery-title {
+      font-size: 2.3rem;
+    }
+
+    .description-box {
+      font-size: 0.95rem;
+    }
+
+    .start-button {
+      padding: 14px 38px;
+      font-size: 1rem;
+    }
+  }
+
+  .ranking-container {
+    .ranking-content {
+      min-width: 320px;
+    }
+  }
+}
+
+/* iPhone específico - ajuste del ranking */
+@media (min-width: 390px) and (max-width: 430px) and (min-height: 844px) and (max-height: 932px) {
+  .ranking-container {
+    .ranking-toggle {
+      padding: 8px 14px;
+      font-size: 0.9rem;
+
+      .icon {
+        font-size: 1.1rem;
+      }
+    }
+
+    .ranking-content {
+      min-width: 300px;
+      max-width: 340px;
+    }
+
+    .ranking-title {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+/* Tablets (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .score-container {
+    top: 18px;
+    right: 18px;
+    padding: 11px 20px;
+    font-size: 1.05rem;
+  }
+
+  .welcome-card {
+    padding: 35px;
+    max-width: 500px;
+
+    .mystery-title {
+      font-size: 2.5rem;
+    }
+
+    .description-box {
+      font-size: 1rem;
+    }
+
+    .start-button {
+      padding: 15px 40px;
+      font-size: 1.05rem;
+    }
+  }
+}
+
+/* iPads y tablets grandes (1025px - 1366px) */
+@media (min-width: 1025px) and (max-width: 1366px) {
+  .score-container {
+    top: 20px;
+    right: 20px;
+  }
+
+  .welcome-card {
+    max-width: 520px;
+  }
+}
+
+/* Pantallas muy anchas (desktop 1367px+) */
+@media (min-width: 1367px) {
+  .welcome-card {
+    max-width: 550px;
+    padding: 45px;
+
+    .mystery-title {
+      font-size: 3rem;
+    }
+
+    .description-box {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+/* Orientación horizontal - Ajustes para welcome card */
+@media (orientation: landscape) and (max-height: 600px) {
+  .welcome-card {
+    padding: 20px 30px;
+    max-height: 90vh;
+    overflow-y: auto;
+
+    .mystery-title {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
+
+    .description-box {
+      font-size: 0.85rem;
+      margin: 12px 0;
+      line-height: 1.4;
+
+      p {
+        margin-bottom: 8px;
+      }
+
+      ul li {
+        margin-bottom: 5px;
+      }
+    }
+
+    .start-button {
+      padding: 10px 30px;
+      font-size: 0.9rem;
+    }
+  }
+
+  .ranking-container {
+    .ranking-content {
+      max-height: 60vh;
+    }
+  }
+}
+
+/* Orientación horizontal - altura media */
+@media (orientation: landscape) and (min-height: 601px) and (max-height: 800px) {
+  .welcome-card {
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  .ranking-container {
+    .ranking-content {
+      max-height: 70vh;
+    }
+  }
+}
+
+
+
+
+    

@@ -1,0 +1,153 @@
+@if (showWelcome()) {
+  <div class="welcome-overlay">
+    <div class="welcome-card">
+      <h1 class="mystery-title">
+        Mystery <span class="gold">Hunter</span>
+      </h1>
+      
+      <div class="description-box">
+        <p>Bienvenido a una aventura de misterios y descubrimientos por Bilbao.</p>
+        
+        <ul>
+          <li>Explora lugares emblemáticos</li>
+          <li>Resuelve acertijos desafiantes</li>
+          <li>Desbloquea historias ocultas</li>
+          <li>Compite en el ranking global</li>
+        </ul>
+        
+        <p><strong>¡Que comience la búsqueda!</strong></p>
+      </div>
+      
+      <button class="start-button" (click)="closeWelcome()">
+        Empezar Aventura
+      </button>
+    </div>
+  </div>
+}
+
+<div id="map" style="height: 100vh; width: 100%"></div>
+
+<div class="score-container">🏆 Puntos: {{ totalPoints() }}</div>
+
+<div class="ranking-container" [class.expanded]="showRanking()">
+  <button class="ranking-toggle" (click)="toggleRanking()">
+    <span class="icon">🏆</span>
+    <span class="text">Ranking</span>
+  </button>
+
+  @if (showRanking()) {
+    <div class="ranking-content">
+      <h3 class="ranking-title">🏆 Top Jugadores</h3>
+
+      @if (loadingRanking()) {
+        <div class="loading">Cargando...</div>
+      } @else if (topPlayers().length === 0) {
+        <div class="no-players">No hay jugadores aún</div>
+      } @else {
+        <div class="players-list">
+          @for (player of topPlayers(); track player.id; let idx = $index) {
+            <div class="player-item" [class.current-user]="player.nombre === userId">
+              <div class="rank">
+                @if (idx === 0) {
+                  <span class="medal gold">🥇</span>
+                } @else if (idx === 1) {
+                  <span class="medal silver">🥈</span>
+                } @else if (idx === 2) {
+                  <span class="medal bronze">🥉</span>
+                } @else {
+                  <span class="position">#{{ idx + 1 }}</span>
+                }
+              </div>
+
+              <div class="player-info">
+                <span class="player-name">
+                  {{ player.nombre }}
+                  @if (player.nombre === userId) {
+                    <span class="you-badge">(Tú)</span>
+                  }
+                </span>
+                <span class="mysteries-count">
+                  {{ player.misteriosResueltos || 0 }} misterios
+                </span>
+              </div>
+
+              <div class="player-points">
+                {{ player.puntos }}
+                <span class="pts">pts</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Mostrar posición del usuario si no está en el top -->
+      @if (userRank() && userRank()! > 10) {
+        <div class="user-position">
+          <div class="separator">...</div>
+          <div class="player-item current-user">
+            <div class="rank">
+              <span class="position">#{{ userRank() }}</span>
+            </div>
+            <div class="player-info">
+              <span class="player-name">
+                {{ userId }}
+                <span class="you-badge">(Tú)</span>
+              </span>
+            </div>
+            <div class="player-points">
+              {{ totalPoints() }}
+              <span class="pts">pts</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- ✅ MODAL DE ÉXITO - FUERA DEL MAPA -->
+@if (showSuccessModal()) {
+  <div class="success-modal-overlay">
+    <div class="success-modal" (click)="$event.stopPropagation()">
+      <div class="success-emoji">🎉</div>
+      <h2 class="success-title">¡Felicidades!</h2>
+      <p class="success-subtitle">Has resuelto el misterio de</p>
+      <p class="success-mystery-title">{{ solvedMysteryTitle() }}</p>
+      <div class="success-points">+{{ earnedPoints() }} puntos</div>
+      <button class="success-close-btn" (click)="closeSuccessModal()">Continuar</button>
+    </div>
+  </div>
+}
+
+@if (selectedMystery()) {
+  <div class="mystery-card-overlay">
+    <div class="mystery-card">
+      <button class="close-btn" (click)="selectedMystery.set(null)">×</button>
+
+      <div class="card-header">
+        <h2>{{ selectedMystery().titulo }}</h2>
+      </div>
+
+      <div class="card-body">
+        <p class="description">{{ selectedMystery().descripcion }}</p>
+
+        <div class="riddle-section">
+          <span class="riddle-label">🔍 El Acertijo:</span>
+          <p class="riddle-text">{{ selectedMystery().acertijo }}</p>
+        </div>
+
+        <div class="answer-section">
+          <input
+            type="text"
+            placeholder="Escribe la respuesta..."
+            #userAnswer
+            (keyup.enter)="checkAnswer(userAnswer.value)"
+          />
+          <button (click)="checkAnswer(userAnswer.value)">Comprobar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<router-outlet></router-outlet>
