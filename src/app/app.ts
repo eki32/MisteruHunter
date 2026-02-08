@@ -60,7 +60,8 @@ export class App {
     };
 
     afterNextRender(async () => {
-      this.L = await import('leaflet');
+       const leafletModule = await import('leaflet');
+      this.L = leafletModule.default || leafletModule;
 
       this.userProgress = await this.mysteryService.getUserProgress(this.userId);
       this.totalPoints.set(this.userProgress.puntos);
