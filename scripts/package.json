@@ -1,0 +1,20 @@
+{
+  "name": "firebase-misterios-loader",
+  "version": "1.0.0",
+  "description": "Script para cargar misterios automáticamente en Firebase",
+  "main": "cargar-misterios-firebase.js",
+  "scripts": {
+    "cargar": "node cargar-misterios-firebase.js"
+  },
+  "keywords": [
+    "firebase",
+    "firestore",
+    "misterios",
+    "geolocalización"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  }
+}
