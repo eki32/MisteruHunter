@@ -46,3 +46,17 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Credenciales de Firebase
+serviceAccountKey.json
+*-firebase-adminsdk-*.json
+scripts/serviceAccountKey.json
+
+# Angular
+/node_modules
+/dist
+/tmp
+/out-tsc
+
+# Scripts
+/scripts/node_modules
