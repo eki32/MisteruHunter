@@ -10,6 +10,7 @@ import {
   updateDoc,
   increment,
   arrayUnion,
+  getDocs,
 } from 'firebase/firestore';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
@@ -18,44 +19,99 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class MysteryService {
-  // ✅ NUEVO: Obtener jugador por nombre (para permitir login de usuarios existentes)
-  async getPlayerByName(playerName: string): Promise<{ id: string; nombre: string } | null> {
+  // ✅ NUEVO: Hashear contraseña de forma simple pero efectiva
+  private async hashPassword(password: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+  }
+
+  // ✅ CORREGIDO: Registrar usuario con contraseña (usando getDocs en lugar de onSnapshot)
+  async registerPlayer(playerName: string, password: string): Promise<{ success: boolean; error?: string; userId?: string }> {
+    try {
+      const app = getApps().length === 0 ? initializeApp(environment.firebase) : getApp();
+      const db = getFirestore(app);
+      const usersRef = collection(db, 'usuarios');
+      
+      // Verificar si el nombre ya existe (usando getDocs en lugar de onSnapshot)
+      const snapshot = await getDocs(usersRef);
+      
+      const existingUser = snapshot.docs.find((doc) => {
+        const data = doc.data();
+        return data['nombre']?.toLowerCase() === playerName.toLowerCase();
+      });
+
+      if (existingUser) {
+        return { success: false, error: 'El nombre ya está en uso' };
+      }
+
+      // Crear nuevo usuario
+      const userId = 'player_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+      const hashedPassword = await this.hashPassword(password);
+
+      const userRef = doc(db, 'usuarios', userId);
+      await setDoc(userRef, {
+        nombre: playerName,
+        password: hashedPassword,
+        puntos: 0,
+        unlockedMysteries: [],
+        fechaCreacion: new Date(),
+      });
+
+      console.log('✅ Jugador registrado:', playerName);
+      return { success: true, userId };
+    } catch (error) {
+      console.error('❌ Error al registrar jugador:', error);
+      return { success: false, error: 'Error al registrar' };
+    }
+  }
+
+  // ✅ CORREGIDO: Login de usuario con contraseña (usando getDocs en lugar de onSnapshot)
+  async loginPlayer(playerName: string, password: string): Promise<{ success: boolean; error?: string; userId?: string; userData?: any }> {
     try {
       const app = getApps().length === 0 ? initializeApp(environment.firebase) : getApp();
       const db = getFirestore(app);
       const usersRef = collection(db, 'usuarios');
 
-      return new Promise((resolve, reject) => {
-        onSnapshot(
-          usersRef,
-          (snapshot) => {
-            const player = snapshot.docs.find((doc) => {
-              const data = doc.data();
-              return data['nombre']?.toLowerCase() === playerName.toLowerCase();
-            });
-
-            if (player) {
-              resolve({
-                id: player.id,
-                nombre: player.data()['nombre'],
-              });
-            } else {
-              resolve(null);
-            }
-          },
-          reject,
-        );
+      const hashedPassword = await this.hashPassword(password);
+      
+      // Obtener snapshot una sola vez
+      const snapshot = await getDocs(usersRef);
+      
+      const userDoc = snapshot.docs.find((doc) => {
+        const data = doc.data();
+        return data['nombre']?.toLowerCase() === playerName.toLowerCase();
       });
+
+      if (!userDoc) {
+        return { success: false, error: 'Usuario no encontrado' };
+      }
+
+      const userData = userDoc.data();
+
+      // Verificar contraseña
+      if (userData['password'] !== hashedPassword) {
+        return { success: false, error: 'Contraseña incorrecta' };
+      }
+
+      // Login exitoso
+      return {
+        success: true,
+        userId: userDoc.id,
+        userData: {
+          nombre: userData['nombre'],
+          puntos: userData['puntos'] || 0,
+          unlockedMysteries: userData['unlockedMysteries'] || [],
+        },
+      };
     } catch (error) {
-      console.error('❌ Error al buscar jugador:', error);
-      return null;
+      console.error('❌ Error en login:', error);
+      return { success: false, error: 'Error al iniciar sesión' };
     }
   }
-
-  // ✅ DEPRECADO: Ya no necesitamos este método porque ahora usamos getPlayerByName
-  // async isPlayerNameTaken(playerName: string, currentUserId: string): Promise<boolean> {
-  //   // Este método ya no se usa, pero lo dejamos comentado por si acaso
-  // }
 
   // ✅ Añadir puntos al usuario
   async addPoints(userId: string, amount: number) {
@@ -71,7 +127,7 @@ export class MysteryService {
           puntos: amount,
           nombre: userId,
           fechaCreacion: new Date(),
-          unlockedMysteries: [], // ✅ Array vacío inicialmente
+          unlockedMysteries: [],
         });
         console.log(`✅ Usuario ${userId} creado con ${amount} puntos`);
       } else {
@@ -92,20 +148,17 @@ export class MysteryService {
       const db = getFirestore(app);
       const userRef = doc(db, 'usuarios', userId);
 
-      // Verificar si el usuario existe
       const userDoc = await getDoc(userRef);
 
       if (!userDoc.exists()) {
-        // Crear usuario si no existe
         await setDoc(userRef, {
           puntos: 0,
           nombre: userId,
           fechaCreacion: new Date(),
-          unlockedMysteries: [mysteryId], // ✅ Primer misterio desbloqueado
+          unlockedMysteries: [mysteryId],
         });
         console.log(`✅ Usuario creado y misterio ${mysteryId} desbloqueado`);
       } else {
-        // Agregar misterio al array (arrayUnion evita duplicados)
         await updateDoc(userRef, {
           unlockedMysteries: arrayUnion(mysteryId),
         });
@@ -139,7 +192,6 @@ export class MysteryService {
         };
       }
 
-      // Si no existe, retornar valores por defecto
       return {
         puntos: 0,
         unlockedMysteries: [],
@@ -195,10 +247,7 @@ export class MysteryService {
               misteriosResueltos: (doc.data()['unlockedMysteries'] || []).length,
             }));
 
-            // Ordenar por puntos (descendente) - ✅ Con tipos explícitos
             players.sort((a: any, b: any) => (b.puntos || 0) - (a.puntos || 0));
-
-            // Retornar solo el top
             resolve(players.slice(0, limit));
           },
           reject,
@@ -226,7 +275,6 @@ export class MysteryService {
               ...doc.data(),
             }));
 
-            // Ordenar por puntos - ✅ Con tipos explícitos
             players.sort((a: any, b: any) => (b.puntos || 0) - (a.puntos || 0));
             resolve(players);
           },
@@ -236,6 +284,40 @@ export class MysteryService {
     } catch (error) {
       console.error('❌ Error al obtener jugadores:', error);
       return [];
+    }
+  }
+
+  // ✅ DEPRECADO: Ya no se usa con el sistema de contraseñas
+  async getPlayerByName(playerName: string): Promise<{ id: string; nombre: string } | null> {
+    try {
+      const app = getApps().length === 0 ? initializeApp(environment.firebase) : getApp();
+      const db = getFirestore(app);
+      const usersRef = collection(db, 'usuarios');
+
+      return new Promise((resolve, reject) => {
+        onSnapshot(
+          usersRef,
+          (snapshot) => {
+            const player = snapshot.docs.find((doc) => {
+              const data = doc.data();
+              return data['nombre']?.toLowerCase() === playerName.toLowerCase();
+            });
+
+            if (player) {
+              resolve({
+                id: player.id,
+                nombre: player.data()['nombre'],
+              });
+            } else {
+              resolve(null);
+            }
+          },
+          reject,
+        );
+      });
+    } catch (error) {
+      console.error('❌ Error al buscar jugador:', error);
+      return null;
     }
   }
 

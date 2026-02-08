@@ -39,7 +39,6 @@
   text-align: center;
   box-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
 
-  // ✅ NUEVO - Logo encima del título
   .mystery-logo {
     width: 120px;
     height: auto;
@@ -70,7 +69,6 @@
     color: white;
     font-size: 1rem;
     transition: all 0.3s ease;
-    
 
     &::placeholder {
       color: rgba(255, 255, 255, 0.5);
@@ -123,7 +121,6 @@
     }
   }
 
-  // ✅ Animación flotante para el logo
   @keyframes float {
     0%,
     100% {
@@ -356,8 +353,143 @@
   }
 }
 
+/* ✅ BOTÓN "VER MÁS JUGADORES" */
+.show-more-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: #d4af37;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  &:hover {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: rgba(212, 175, 55, 0.5);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+/* Botón para cambiar entre login y registro */
+.toggle-mode-btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+
+  strong {
+    color: #d4af37;
+    font-weight: 700;
+  }
+
+  &:hover {
+    background: rgba(212, 175, 55, 0.05);
+    border-color: rgba(212, 175, 55, 0.5);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/* Mensaje de error */
+.error-message {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  text-align: center;
+  animation: shake 0.3s ease;
+}
+
+/* Input con foco mejorado */
+.auth-input {
+  &:focus {
+    outline: none;
+    border-color: #f1c40f !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+  }
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* ✅ BOTÓN DE LOGOUT - CORREGIDO */
+.logout-button {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  z-index: 10000;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.6);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
 /* ============================================
-   MEDIA QUERIES - WELCOME CARD RESPONSIVE
+   MEDIA QUERIES - RESPONSIVE
    ============================================ */
 
 /* Teléfonos plegables pequeños (hasta 350px) */
@@ -461,6 +593,18 @@
         font-size: 1rem;
       }
     }
+  }
+
+  .toggle-mode-btn {
+    font-size: 0.8rem;
+    padding: 10px;
+  }
+
+  .logout-button {
+    bottom: 10px;
+    left: 10px;
+    padding: 8px 14px;
+    font-size: 11px;
   }
 }
 
@@ -754,53 +898,4 @@
       max-height: 70vh;
     }
   }
-  @keyframes shake {
-  0%, 100% { 
-    transform: translateX(0); 
-  }
-  25% { 
-    transform: translateX(-5px); 
-  }
-  75% { 
-    transform: translateX(5px); 
-  }
-}
-
-
-/* ✅ NUEVO ESTILO PARA EL BOTÓN "VER MÁS JUGADORES" */
-/* Agregar al final de tu archivo SCSS existente, después de .user-position */
-
-.show-more-btn {
-  width: 100%;
-  margin-top: 12px;
-  padding: 10px;
-  background: rgba(212, 175, 55, 0.1);
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  color: #d4af37;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-
-  &:hover {
-    background: rgba(212, 175, 55, 0.2);
-    border-color: rgba(212, 175, 55, 0.5);
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-
-  span {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-}
 }

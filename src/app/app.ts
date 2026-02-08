@@ -28,7 +28,8 @@ export class App {
   private cdr = inject(ChangeDetectorRef);
   private ngZone = inject(NgZone);
 
-  userId: string;
+  userId: string = ''; // Vacío hasta que haga login
+  playerName = signal(''); // ✅ NUEVO: Para mostrar el nombre del jugador
 
   totalPoints = signal(0);
   selectedMystery = signal<any>(null);
@@ -38,17 +39,19 @@ export class App {
   solvedMysteryTitle = signal('');
   earnedPoints = signal(0);
 
-  // ✅ SIGNALS PARA EL RANKING
   showRanking = signal(false);
   topPlayers = signal<any[]>([]);
   loadingRanking = signal(false);
   userRank = signal<number | null>(null);
+  showAllPlayers = signal(false);
 
-  // ✅ NUEVO: Control de paginación del ranking
-  showAllPlayers = signal(false); // Controla si mostramos 6 o 10 jugadores
-
-  // ✅ Signal para mostrar error de nombre duplicado
+  // ✅ Control del sistema de login/registro
+  isLoginMode = signal(true); // true = login, false = registro
   nameError = signal('');
+  passwordError = signal('');
+
+  // ✅ NUEVO: Control del menú de usuario
+  showUserMenu = signal(false);
 
   private map: any;
   private playerMarker: any;
@@ -62,9 +65,6 @@ export class App {
   };
 
   constructor() {
-    this.userId = this.getOrCreateUserId();
-    console.log('👤 ID del jugador:', this.userId);
-
     window.checkAnswerPopup = (titulo: string) => {
       this.ngZone.run(() => {
         const inputElement = document.getElementById(`ans-${titulo}`) as HTMLInputElement;
@@ -79,96 +79,185 @@ export class App {
       const leafletModule = await import('leaflet');
       this.L = leafletModule.default || leafletModule;
 
-      this.userProgress = await this.mysteryService.getUserProgress(this.userId);
-      this.totalPoints.set(this.userProgress.puntos);
-      console.log('📊 Progreso cargado:', this.userProgress);
+      // ✅ Verificar si hay sesión guardada
+      const savedUserId = localStorage.getItem('mysteryHunterUserId');
+      const savedPlayerName = localStorage.getItem('mysteryHunterPlayerName');
+      
+      if (savedUserId && savedPlayerName) {
+        this.userId = savedUserId;
+        this.playerName.set(savedPlayerName);
+        this.userProgress = await this.mysteryService.getUserProgress(this.userId);
+        this.totalPoints.set(this.userProgress.puntos);
+        this.showWelcome.set(false); // Saltar pantalla de bienvenida
+        console.log('👋 Sesión recuperada:', savedPlayerName);
+      }
 
       await this.initMap(this.L);
       this.loadMysteries(this.L);
-
-      // ✅ Cargar ranking inicial
       this.loadRanking();
     });
   }
 
-  // ✅ MÉTODO ACTUALIZADO: Permite continuar si es el mismo usuario
-  async closeWelcomeWithName(playerName: string) {
+  // ✅ Toggle entre login y registro
+  toggleMode() {
+    this.isLoginMode.update((v) => !v);
+    this.nameError.set('');
+    this.passwordError.set('');
+  }
+
+  // ✅ NUEVO: Toggle menú de usuario
+  toggleUserMenu() {
+    this.showUserMenu.update((v) => !v);
+  }
+
+  // ✅ NUEVO: Cerrar sesión
+logout() {
+  // Confirmar antes de cerrar sesión
+  if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+    // Limpiar datos locales
+    localStorage.removeItem('mysteryHunterUserId');
+    localStorage.removeItem('mysteryHunterPlayerName');
+    
+    // Resetear el estado de la aplicación
+    this.userId = '';
+    this.playerName.set('');
+    this.totalPoints.set(0);
+    this.userProgress = { puntos: 0, unlockedMysteries: [] };
+    this.showRanking.set(false);
+    
+    // Resetear los marcadores del mapa
+    this.markers.forEach((marker) => {
+      if (this.L) {
+        const lockedIcon = this.L.icon({
+          iconUrl: 'assets/locked.png',
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+        });
+        marker.setIcon(lockedIcon);
+        marker.bindPopup(`
+          <div style="text-align: center; padding: 10px;">
+            <b>🔒 Bloqueado</b><br>
+            <span style="font-size: 12px;">Acércate para desbloquear</span>
+          </div>`);
+      }
+    });
+    
+    // Actualizar los misterios a bloqueados
+    this.misteriosList.forEach((m) => {
+      m.desbloqueado = false;
+    });
+    
+    // Mostrar pantalla de bienvenida
+    this.showWelcome.set(true);
+    
+    console.log('👋 Sesión cerrada');
+  }
+}
+
+
+
+  // ✅ Procesar login o registro
+  async handleAuth(playerName: string, password: string) {
+    // Limpiar errores
+    this.nameError.set('');
+    this.passwordError.set('');
+
+    // Validaciones
     if (!playerName || !playerName.trim()) {
       this.nameError.set('Por favor, escribe tu nombre');
       return;
     }
 
+    if (!password || password.length < 4) {
+      this.passwordError.set('La contraseña debe tener al menos 4 caracteres');
+      return;
+    }
+
     const trimmedName = playerName.trim();
 
-    // ✅ Verificar si el nombre existe y obtener el userId asociado
-    const existingPlayer = await this.mysteryService.getPlayerByName(trimmedName);
+    if (this.isLoginMode()) {
+      // ✅ MODO LOGIN
+      const result = await this.mysteryService.loginPlayer(trimmedName, password);
 
-    if (existingPlayer) {
-      // ✅ El nombre existe
-      if (existingPlayer.id === this.userId) {
-        // Es el mismo usuario - permitir continuar
-        console.log('✅ Usuario existente continuando con su progreso');
-        this.nameError.set('');
+      if (result.success && result.userId) {
+        // Login exitoso
+        this.userId = result.userId;
+        this.playerName.set(trimmedName);
+        localStorage.setItem('mysteryHunterUserId', result.userId);
         localStorage.setItem('mysteryHunterPlayerName', trimmedName);
+
+        // Cargar progreso
+        this.userProgress = await this.mysteryService.getUserProgress(result.userId);
+        this.totalPoints.set(this.userProgress.puntos);
+
+        console.log('✅ Login exitoso:', trimmedName);
         this.showWelcome.set(false);
+        
+        // Recargar misterios con el progreso del usuario
+        if (this.L) {
+          this.loadMysteries(this.L);
+        }
       } else {
-        // Es otro usuario - mostrar error
-        this.nameError.set('⚠️ Este nombre ya está en uso. Por favor, elige otro.');
-        return;
+        // Login fallido
+        if (result.error === 'Usuario no encontrado') {
+          this.nameError.set('❌ Usuario no encontrado');
+        } else if (result.error === 'Contraseña incorrecta') {
+          this.passwordError.set('❌ Contraseña incorrecta');
+        } else {
+          this.nameError.set('❌ Error al iniciar sesión');
+        }
       }
     } else {
-      // ✅ Nombre disponible - crear nuevo jugador
-      this.nameError.set('');
-      localStorage.setItem('mysteryHunterPlayerName', trimmedName);
-      await this.mysteryService.updatePlayerName(this.userId, trimmedName);
-      console.log('✅ Nuevo jugador creado:', trimmedName);
-      this.showWelcome.set(false);
+      // ✅ MODO REGISTRO
+      const result = await this.mysteryService.registerPlayer(trimmedName, password);
+
+      if (result.success && result.userId) {
+        // Registro exitoso
+        this.userId = result.userId;
+        this.playerName.set(trimmedName);
+        localStorage.setItem('mysteryHunterUserId', result.userId);
+        localStorage.setItem('mysteryHunterPlayerName', trimmedName);
+
+        this.userProgress = { puntos: 0, unlockedMysteries: [] };
+        this.totalPoints.set(0);
+
+        console.log('✅ Registro exitoso:', trimmedName);
+        this.showWelcome.set(false);
+      } else {
+        // Registro fallido
+        if (result.error === 'El nombre ya está en uso') {
+          this.nameError.set('⚠️ Este nombre ya está en uso');
+        } else {
+          this.nameError.set('❌ Error al registrarse');
+        }
+      }
     }
   }
 
-  private getOrCreateUserId(): string {
-    let userId = localStorage.getItem('mysteryHunterUserId');
-
-    if (!userId) {
-      userId = 'player_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
-      localStorage.setItem('mysteryHunterUserId', userId);
-      console.log('✨ Nuevo jugador creado:', userId);
-    } else {
-      console.log('👋 Jugador existente:', userId);
-    }
-
-    return userId;
-  }
-
-  // ✅ TOGGLE RANKING
   toggleRanking() {
     this.showRanking.update((v) => !v);
     if (this.showRanking()) {
-      this.showAllPlayers.set(false); // Resetear a 6 jugadores al abrir
+      this.showAllPlayers.set(false);
       this.loadRanking();
+      this.showUserMenu.set(false); // Cerrar menú de usuario al abrir ranking
     }
   }
 
-  // ✅ NUEVO: Toggle para mostrar más jugadores
   toggleShowAllPlayers() {
     this.showAllPlayers.update((v) => !v);
   }
 
-  // ✅ NUEVO: Método computed para obtener jugadores visibles
   getVisiblePlayers(): any[] {
     const limit = this.showAllPlayers() ? 10 : 6;
     return this.topPlayers().slice(0, limit);
   }
 
-  // ✅ CARGAR RANKING DESDE FIREBASE
   async loadRanking() {
     this.loadingRanking.set(true);
     try {
-      // Obtener siempre los top 10 (aunque solo mostremos 6 inicialmente)
       const ranking = await this.mysteryService.getTopPlayers(10);
       this.topPlayers.set(ranking);
 
-      // Calcular posición del usuario
       const allPlayers = await this.mysteryService.getAllPlayers();
       const userIndex = allPlayers.findIndex((p) => p.id === this.userId);
       this.userRank.set(userIndex >= 0 ? userIndex + 1 : null);
