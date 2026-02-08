@@ -18,6 +18,45 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class MysteryService {
+  // ✅ NUEVO: Obtener jugador por nombre (para permitir login de usuarios existentes)
+  async getPlayerByName(playerName: string): Promise<{ id: string; nombre: string } | null> {
+    try {
+      const app = getApps().length === 0 ? initializeApp(environment.firebase) : getApp();
+      const db = getFirestore(app);
+      const usersRef = collection(db, 'usuarios');
+
+      return new Promise((resolve, reject) => {
+        onSnapshot(
+          usersRef,
+          (snapshot) => {
+            const player = snapshot.docs.find((doc) => {
+              const data = doc.data();
+              return data['nombre']?.toLowerCase() === playerName.toLowerCase();
+            });
+
+            if (player) {
+              resolve({
+                id: player.id,
+                nombre: player.data()['nombre'],
+              });
+            } else {
+              resolve(null);
+            }
+          },
+          reject,
+        );
+      });
+    } catch (error) {
+      console.error('❌ Error al buscar jugador:', error);
+      return null;
+    }
+  }
+
+  // ✅ DEPRECADO: Ya no necesitamos este método porque ahora usamos getPlayerByName
+  // async isPlayerNameTaken(playerName: string, currentUserId: string): Promise<boolean> {
+  //   // Este método ya no se usa, pero lo dejamos comentado por si acaso
+  // }
+
   // ✅ Añadir puntos al usuario
   async addPoints(userId: string, amount: number) {
     try {

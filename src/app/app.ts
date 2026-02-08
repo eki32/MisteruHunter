@@ -28,7 +28,7 @@ export class App {
   private cdr = inject(ChangeDetectorRef);
   private ngZone = inject(NgZone);
 
-  userId: string; // ✅ Ahora público para usarlo en el template
+  userId: string;
 
   totalPoints = signal(0);
   selectedMystery = signal<any>(null);
@@ -38,11 +38,17 @@ export class App {
   solvedMysteryTitle = signal('');
   earnedPoints = signal(0);
 
-  // ✅ NUEVOS SIGNALS PARA EL RANKING
+  // ✅ SIGNALS PARA EL RANKING
   showRanking = signal(false);
   topPlayers = signal<any[]>([]);
   loadingRanking = signal(false);
   userRank = signal<number | null>(null);
+
+  // ✅ NUEVO: Control de paginación del ranking
+  showAllPlayers = signal(false); // Controla si mostramos 6 o 10 jugadores
+
+  // ✅ Signal para mostrar error de nombre duplicado
+  nameError = signal('');
 
   private map: any;
   private playerMarker: any;
@@ -85,24 +91,45 @@ export class App {
     });
   }
 
-  closeWelcomeWithName(playerName: string) {
+  // ✅ MÉTODO ACTUALIZADO: Permite continuar si es el mismo usuario
+  async closeWelcomeWithName(playerName: string) {
     if (!playerName || !playerName.trim()) {
-      alert('Por favor, escribe tu nombre');
+      this.nameError.set('Por favor, escribe tu nombre');
       return;
     }
 
-    localStorage.setItem('mysteryHunterPlayerName', playerName.trim());
-    this.mysteryService.updatePlayerName(this.userId, playerName.trim());
+    const trimmedName = playerName.trim();
 
-    this.showWelcome.set(false);
+    // ✅ Verificar si el nombre existe y obtener el userId asociado
+    const existingPlayer = await this.mysteryService.getPlayerByName(trimmedName);
+
+    if (existingPlayer) {
+      // ✅ El nombre existe
+      if (existingPlayer.id === this.userId) {
+        // Es el mismo usuario - permitir continuar
+        console.log('✅ Usuario existente continuando con su progreso');
+        this.nameError.set('');
+        localStorage.setItem('mysteryHunterPlayerName', trimmedName);
+        this.showWelcome.set(false);
+      } else {
+        // Es otro usuario - mostrar error
+        this.nameError.set('⚠️ Este nombre ya está en uso. Por favor, elige otro.');
+        return;
+      }
+    } else {
+      // ✅ Nombre disponible - crear nuevo jugador
+      this.nameError.set('');
+      localStorage.setItem('mysteryHunterPlayerName', trimmedName);
+      await this.mysteryService.updatePlayerName(this.userId, trimmedName);
+      console.log('✅ Nuevo jugador creado:', trimmedName);
+      this.showWelcome.set(false);
+    }
   }
 
   private getOrCreateUserId(): string {
-    // Intentar recuperar del localStorage
     let userId = localStorage.getItem('mysteryHunterUserId');
 
     if (!userId) {
-      // Generar nuevo ID único
       userId = 'player_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
       localStorage.setItem('mysteryHunterUserId', userId);
       console.log('✨ Nuevo jugador creado:', userId);
@@ -117,20 +144,33 @@ export class App {
   toggleRanking() {
     this.showRanking.update((v) => !v);
     if (this.showRanking()) {
+      this.showAllPlayers.set(false); // Resetear a 6 jugadores al abrir
       this.loadRanking();
     }
+  }
+
+  // ✅ NUEVO: Toggle para mostrar más jugadores
+  toggleShowAllPlayers() {
+    this.showAllPlayers.update((v) => !v);
+  }
+
+  // ✅ NUEVO: Método computed para obtener jugadores visibles
+  getVisiblePlayers(): any[] {
+    const limit = this.showAllPlayers() ? 10 : 6;
+    return this.topPlayers().slice(0, limit);
   }
 
   // ✅ CARGAR RANKING DESDE FIREBASE
   async loadRanking() {
     this.loadingRanking.set(true);
     try {
+      // Obtener siempre los top 10 (aunque solo mostremos 6 inicialmente)
       const ranking = await this.mysteryService.getTopPlayers(10);
       this.topPlayers.set(ranking);
 
       // Calcular posición del usuario
       const allPlayers = await this.mysteryService.getAllPlayers();
-      const userIndex = allPlayers.findIndex((p) => p.nombre === this.userId);
+      const userIndex = allPlayers.findIndex((p) => p.id === this.userId);
       this.userRank.set(userIndex >= 0 ? userIndex + 1 : null);
 
       console.log('🏆 Ranking cargado:', ranking);
@@ -199,7 +239,6 @@ export class App {
       ])
         .then(() => {
           console.log('✅ Progreso guardado en Firebase');
-          // ✅ Actualizar ranking después de ganar puntos
           this.loadRanking();
         })
         .catch((err) => {
@@ -244,23 +283,22 @@ export class App {
           (position) => {
             const { latitude, longitude } = position.coords;
             this.finishMapSetup(L, latitude, longitude);
-            resolve(); // ✅ Resuelve cuando el mapa está listo
+            resolve();
           },
           () => {
             console.warn('Ubicación denegada.');
             this.finishMapSetup(L, 43.263, -2.935);
-            resolve(); // ✅ Resuelve aunque falle la geolocalización
+            resolve();
           },
           { enableHighAccuracy: true },
         );
       } else {
         this.finishMapSetup(L, 43.263, -2.935);
-        resolve(); // ✅ Resuelve si no hay geolocalización
+        resolve();
       }
     });
   }
 
-  // He extraído el resto de tu configuración para que no se repita código
   private finishMapSetup(L: any, lat: number, lng: number) {
     this.map = L.map('map', {
       center: [lat, lng],
@@ -269,9 +307,9 @@ export class App {
     });
 
     const iconDefault = L.icon({
-      iconRetinaUrl: '/leaflet/marker-icon-2x.png', // ← Cambio
-      iconUrl: '/leaflet/marker-icon.png', // ← Cambio
-      shadowUrl: '/leaflet/marker-shadow.png', // ← Cambio
+      iconRetinaUrl: '/leaflet/marker-icon-2x.png',
+      iconUrl: '/leaflet/marker-icon.png',
+      shadowUrl: '/leaflet/marker-shadow.png',
       iconSize: [25, 41],
       iconAnchor: [12, 41],
       popupAnchor: [1, -34],
@@ -284,9 +322,8 @@ export class App {
       className: 'map-lighter',
     }).addTo(this.map);
 
-    // Activamos el rastreo para el punto azul
     this.map.locate({
-      setView: false, // Importante: que no mueva la cámara cada vez que camines
+      setView: false,
       watch: true,
       enableHighAccuracy: true,
     });
@@ -368,7 +405,6 @@ export class App {
   }
 
   loadMysteries(L: any) {
-    // ✅ Validación de seguridad
     if (!this.map) {
       console.error('❌ El mapa no está inicializado');
       return;
@@ -389,7 +425,6 @@ export class App {
     this.mysteryService.getMysteries().subscribe((misterios) => {
       console.log('📦 Misterios cargados:', misterios);
 
-      // ✅ Marcar como desbloqueados según progreso del usuario
       this.misteriosList = misterios.map((m) => ({
         ...m,
         desbloqueado: this.userProgress.unlockedMysteries.includes(m.id),

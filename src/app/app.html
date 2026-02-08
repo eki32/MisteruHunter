@@ -19,15 +19,19 @@
         
         <p><strong>¡Que comience la búsqueda!</strong></p>
         
-        <!-- ✅ Input movido DENTRO del description-box -->
         <input 
           type="text" 
           #playerNameInput
           placeholder="Escribe tu nombre..." 
           style="width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #d4af37; border-radius: 8px; background: rgba(255,255,255,0.1); color: white; font-size: 1rem;">
+        
+        @if (nameError()) {
+          <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 0.9rem; text-align: center; animation: shake 0.3s ease;">
+            {{ nameError() }}
+          </div>
+        }
       </div>
       
-      <!-- ✅ CAMBIADO: closeWelcome() → closeWelcomeWithName() -->
       <button class="start-button" (click)="closeWelcomeWithName(playerNameInput.value)">
         Empezar Aventura
       </button>
@@ -55,7 +59,8 @@
         <div class="no-players">No hay jugadores aún</div>
       } @else {
         <div class="players-list">
-          @for (player of topPlayers(); track player.id; let idx = $index) {
+          <!-- ✅ CAMBIADO: Ahora usa getVisiblePlayers() en lugar de topPlayers() -->
+          @for (player of getVisiblePlayers(); track player.id; let idx = $index) {
             <div class="player-item" [class.current-user]="player.nombre === userId">
               <div class="rank">
                 @if (idx === 0) {
@@ -88,6 +93,17 @@
             </div>
           }
         </div>
+
+        <!-- ✅ NUEVO: Botón para mostrar más jugadores (solo aparece si hay más de 6) -->
+        @if (topPlayers().length > 6) {
+          <button class="show-more-btn" (click)="toggleShowAllPlayers()">
+            @if (showAllPlayers()) {
+              <span>▲ Mostrar menos</span>
+            } @else {
+              <span>▼ Ver más jugadores</span>
+            }
+          </button>
+        }
       }
 
       @if (userRank() && userRank()! > 10) {
