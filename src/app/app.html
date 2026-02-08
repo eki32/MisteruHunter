@@ -18,9 +18,17 @@
         </ul>
         
         <p><strong>¡Que comience la búsqueda!</strong></p>
+        
+        <!-- ✅ Input movido DENTRO del description-box -->
+        <input 
+          type="text" 
+          #playerNameInput
+          placeholder="Escribe tu nombre..." 
+          style="width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #d4af37; border-radius: 8px; background: rgba(255,255,255,0.1); color: white; font-size: 1rem;">
       </div>
       
-      <button class="start-button" (click)="closeWelcome()">
+      <!-- ✅ CAMBIADO: closeWelcome() → closeWelcomeWithName() -->
+      <button class="start-button" (click)="closeWelcomeWithName(playerNameInput.value)">
         Empezar Aventura
       </button>
     </div>
@@ -82,7 +90,6 @@
         </div>
       }
 
-      <!-- Mostrar posición del usuario si no está en el top -->
       @if (userRank() && userRank()! > 10) {
         <div class="user-position">
           <div class="separator">...</div>
@@ -107,7 +114,6 @@
   }
 </div>
 
-<!-- ✅ MODAL DE ÉXITO - FUERA DEL MAPA -->
 @if (showSuccessModal()) {
   <div class="success-modal-overlay">
     <div class="success-modal" (click)="$event.stopPropagation()">

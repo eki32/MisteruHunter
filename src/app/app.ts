@@ -1,4 +1,11 @@
-import { Component, inject, afterNextRender, signal, ChangeDetectorRef, NgZone } from '@angular/core';
+import {
+  Component,
+  inject,
+  afterNextRender,
+  signal,
+  ChangeDetectorRef,
+  NgZone,
+} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MysteryService } from './services/mystery';
 
@@ -21,7 +28,7 @@ export class App {
   private cdr = inject(ChangeDetectorRef);
   private ngZone = inject(NgZone);
 
-  userId = 'jugador1'; // ✅ Ahora público para usarlo en el template
+  userId: string; // ✅ Ahora público para usarlo en el template
 
   totalPoints = signal(0);
   selectedMystery = signal<any>(null);
@@ -49,6 +56,9 @@ export class App {
   };
 
   constructor() {
+    this.userId = this.getOrCreateUserId();
+    console.log('👤 ID del jugador:', this.userId);
+
     window.checkAnswerPopup = (titulo: string) => {
       this.ngZone.run(() => {
         const inputElement = document.getElementById(`ans-${titulo}`) as HTMLInputElement;
@@ -60,7 +70,7 @@ export class App {
     };
 
     afterNextRender(async () => {
-       const leafletModule = await import('leaflet');
+      const leafletModule = await import('leaflet');
       this.L = leafletModule.default || leafletModule;
 
       this.userProgress = await this.mysteryService.getUserProgress(this.userId);
@@ -69,19 +79,43 @@ export class App {
 
       await this.initMap(this.L);
       this.loadMysteries(this.L);
-      
+
       // ✅ Cargar ranking inicial
       this.loadRanking();
     });
   }
 
-  closeWelcome() {
+  closeWelcomeWithName(playerName: string) {
+    if (!playerName || !playerName.trim()) {
+      alert('Por favor, escribe tu nombre');
+      return;
+    }
+
+    localStorage.setItem('mysteryHunterPlayerName', playerName.trim());
+    this.mysteryService.updatePlayerName(this.userId, playerName.trim());
+
     this.showWelcome.set(false);
+  }
+
+  private getOrCreateUserId(): string {
+    // Intentar recuperar del localStorage
+    let userId = localStorage.getItem('mysteryHunterUserId');
+
+    if (!userId) {
+      // Generar nuevo ID único
+      userId = 'player_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+      localStorage.setItem('mysteryHunterUserId', userId);
+      console.log('✨ Nuevo jugador creado:', userId);
+    } else {
+      console.log('👋 Jugador existente:', userId);
+    }
+
+    return userId;
   }
 
   // ✅ TOGGLE RANKING
   toggleRanking() {
-    this.showRanking.update(v => !v);
+    this.showRanking.update((v) => !v);
     if (this.showRanking()) {
       this.loadRanking();
     }
@@ -96,7 +130,7 @@ export class App {
 
       // Calcular posición del usuario
       const allPlayers = await this.mysteryService.getAllPlayers();
-      const userIndex = allPlayers.findIndex(p => p.nombre === this.userId);
+      const userIndex = allPlayers.findIndex((p) => p.nombre === this.userId);
       this.userRank.set(userIndex >= 0 ? userIndex + 1 : null);
 
       console.log('🏆 Ranking cargado:', ranking);
@@ -185,9 +219,7 @@ export class App {
   closeSuccessModal() {
     this.showSuccessModal.set(false);
 
-    const misterioResuelto = this.misteriosList.find(
-      (m) => m.titulo === this.solvedMysteryTitle()
-    );
+    const misterioResuelto = this.misteriosList.find((m) => m.titulo === this.solvedMysteryTitle());
 
     if (misterioResuelto) {
       const marker = this.markers.get(misterioResuelto.id);
@@ -205,74 +237,74 @@ export class App {
     }
   }
 
-async initMap(L: any): Promise<void> {
-  return new Promise((resolve) => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          this.finishMapSetup(L, latitude, longitude);
-          resolve(); // ✅ Resuelve cuando el mapa está listo
-        },
-        () => {
-          console.warn("Ubicación denegada.");
-          this.finishMapSetup(L, 43.2630, -2.9350);
-          resolve(); // ✅ Resuelve aunque falle la geolocalización
-        },
-        { enableHighAccuracy: true }
-      );
-    } else {
-      this.finishMapSetup(L, 43.2630, -2.9350);
-      resolve(); // ✅ Resuelve si no hay geolocalización
-    }
-  });
-}
+  async initMap(L: any): Promise<void> {
+    return new Promise((resolve) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            this.finishMapSetup(L, latitude, longitude);
+            resolve(); // ✅ Resuelve cuando el mapa está listo
+          },
+          () => {
+            console.warn('Ubicación denegada.');
+            this.finishMapSetup(L, 43.263, -2.935);
+            resolve(); // ✅ Resuelve aunque falle la geolocalización
+          },
+          { enableHighAccuracy: true },
+        );
+      } else {
+        this.finishMapSetup(L, 43.263, -2.935);
+        resolve(); // ✅ Resuelve si no hay geolocalización
+      }
+    });
+  }
 
-// He extraído el resto de tu configuración para que no se repita código
-private finishMapSetup(L: any, lat: number, lng: number) {
-  this.map = L.map('map', {
-    center: [lat, lng],
-    zoom: 14,
-    zoomControl: false,
-  });
+  // He extraído el resto de tu configuración para que no se repita código
+  private finishMapSetup(L: any, lat: number, lng: number) {
+    this.map = L.map('map', {
+      center: [lat, lng],
+      zoom: 14,
+      zoomControl: false,
+    });
 
-  const iconDefault = L.icon({
-  iconRetinaUrl: '/leaflet/marker-icon-2x.png',  // ← Cambio
-  iconUrl: '/leaflet/marker-icon.png',            // ← Cambio
-  shadowUrl: '/leaflet/marker-shadow.png',        // ← Cambio
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-  });
-  L.Marker.prototype.options.icon = iconDefault;
+    const iconDefault = L.icon({
+      iconRetinaUrl: '/leaflet/marker-icon-2x.png', // ← Cambio
+      iconUrl: '/leaflet/marker-icon.png', // ← Cambio
+      shadowUrl: '/leaflet/marker-shadow.png', // ← Cambio
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41],
+    });
+    L.Marker.prototype.options.icon = iconDefault;
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap',
-    className: 'map-lighter',
-  }).addTo(this.map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap',
+      className: 'map-lighter',
+    }).addTo(this.map);
 
-  // Activamos el rastreo para el punto azul
-  this.map.locate({
-    setView: false, // Importante: que no mueva la cámara cada vez que camines
-    watch: true,
-    enableHighAccuracy: true,
-  });
+    // Activamos el rastreo para el punto azul
+    this.map.locate({
+      setView: false, // Importante: que no mueva la cámara cada vez que camines
+      watch: true,
+      enableHighAccuracy: true,
+    });
 
-  this.map.on('locationfound', (e: any) => {
-    if (!this.playerMarker) {
-      this.playerMarker = L.circleMarker(e.latlng, {
-        radius: 8,
-        color: '#007bff',
-        fillColor: '#007bff',
-        fillOpacity: 0.8,
-      }).addTo(this.map);
-    } else {
-      this.playerMarker.setLatLng(e.latlng);
-    }
-    this.updateMysteriesDistance(e.latlng);
-  });
-}
+    this.map.on('locationfound', (e: any) => {
+      if (!this.playerMarker) {
+        this.playerMarker = L.circleMarker(e.latlng, {
+          radius: 8,
+          color: '#007bff',
+          fillColor: '#007bff',
+          fillOpacity: 0.8,
+        }).addTo(this.map);
+      } else {
+        this.playerMarker.setLatLng(e.latlng);
+      }
+      this.updateMysteriesDistance(e.latlng);
+    });
+  }
 
   updateMysteriesDistance(userLocation: any) {
     if (!this.L || this.misteriosList.length === 0) return;
@@ -300,7 +332,6 @@ private finishMapSetup(L: any, lat: number, lng: number) {
       marker.setIcon(lockedIcon);
 
       if (distance < unlockRadius) {
-
         const popupContent = `
           <div class="popup-mystery" style="padding: 12px; text-align: center; min-width: 200px;">
             <h3 style="color: #d4af37; margin: 0 0 10px 0; font-size: 16px;">🔍 ${m.titulo}</h3>
@@ -337,13 +368,12 @@ private finishMapSetup(L: any, lat: number, lng: number) {
   }
 
   loadMysteries(L: any) {
+    // ✅ Validación de seguridad
+    if (!this.map) {
+      console.error('❌ El mapa no está inicializado');
+      return;
+    }
 
-      // ✅ Validación de seguridad
-  if (!this.map) {
-    console.error('❌ El mapa no está inicializado');
-    return;
-  }
-  
     const lockedIcon = L.icon({
       iconUrl: 'assets/locked.png',
       iconSize: [32, 32],

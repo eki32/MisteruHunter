@@ -1,6 +1,16 @@
 import { Injectable } from '@angular/core';
 import { initializeApp, getApp, getApps } from 'firebase/app';
-import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, updateDoc, increment, arrayUnion } from 'firebase/firestore';
+import {
+  getFirestore,
+  collection,
+  onSnapshot,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  increment,
+  arrayUnion,
+} from 'firebase/firestore';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 
@@ -8,7 +18,6 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class MysteryService {
-  
   // ✅ Añadir puntos al usuario
   async addPoints(userId: string, amount: number) {
     try {
@@ -130,64 +139,87 @@ export class MysteryService {
     });
   }
 
-// ✅ Obtener top jugadores ordenados por puntos
-async getTopPlayers(limit: number = 10): Promise<any[]> {
-  try {
-    const app = getApps().length === 0 ? initializeApp(environment.firebase) : getApp();
-    const db = getFirestore(app);
-    const usersRef = collection(db, 'usuarios');
+  // ✅ Obtener top jugadores ordenados por puntos
+  async getTopPlayers(limit: number = 10): Promise<any[]> {
+    try {
+      const app = getApps().length === 0 ? initializeApp(environment.firebase) : getApp();
+      const db = getFirestore(app);
+      const usersRef = collection(db, 'usuarios');
 
-    return new Promise((resolve, reject) => {
-      onSnapshot(
-        usersRef,
-        (snapshot) => {
-          const players = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-            misteriosResueltos: (doc.data()['unlockedMysteries'] || []).length,
-          }));
+      return new Promise((resolve, reject) => {
+        onSnapshot(
+          usersRef,
+          (snapshot) => {
+            const players = snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+              misteriosResueltos: (doc.data()['unlockedMysteries'] || []).length,
+            }));
 
-          // Ordenar por puntos (descendente) - ✅ Con tipos explícitos
-          players.sort((a: any, b: any) => (b.puntos || 0) - (a.puntos || 0));
+            // Ordenar por puntos (descendente) - ✅ Con tipos explícitos
+            players.sort((a: any, b: any) => (b.puntos || 0) - (a.puntos || 0));
 
-          // Retornar solo el top
-          resolve(players.slice(0, limit));
-        },
-        reject
-      );
-    });
-  } catch (error) {
-    console.error('❌ Error al obtener top jugadores:', error);
-    return [];
+            // Retornar solo el top
+            resolve(players.slice(0, limit));
+          },
+          reject,
+        );
+      });
+    } catch (error) {
+      console.error('❌ Error al obtener top jugadores:', error);
+      return [];
+    }
   }
-}
 
-// ✅ Obtener todos los jugadores para calcular ranking
-async getAllPlayers(): Promise<any[]> {
-  try {
-    const app = getApps().length === 0 ? initializeApp(environment.firebase) : getApp();
-    const db = getFirestore(app);
-    const usersRef = collection(db, 'usuarios');
+  // ✅ Obtener todos los jugadores para calcular ranking
+  async getAllPlayers(): Promise<any[]> {
+    try {
+      const app = getApps().length === 0 ? initializeApp(environment.firebase) : getApp();
+      const db = getFirestore(app);
+      const usersRef = collection(db, 'usuarios');
 
-    return new Promise((resolve, reject) => {
-      onSnapshot(
-        usersRef,
-        (snapshot) => {
-          const players = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
+      return new Promise((resolve, reject) => {
+        onSnapshot(
+          usersRef,
+          (snapshot) => {
+            const players = snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
 
-          // Ordenar por puntos - ✅ Con tipos explícitos
-          players.sort((a: any, b: any) => (b.puntos || 0) - (a.puntos || 0));
-          resolve(players);
-        },
-        reject
-      );
-    });
-  } catch (error) {
-    console.error('❌ Error al obtener jugadores:', error);
-    return [];
+            // Ordenar por puntos - ✅ Con tipos explícitos
+            players.sort((a: any, b: any) => (b.puntos || 0) - (a.puntos || 0));
+            resolve(players);
+          },
+          reject,
+        );
+      });
+    } catch (error) {
+      console.error('❌ Error al obtener jugadores:', error);
+      return [];
+    }
   }
-}
+
+  async updatePlayerName(userId: string, playerName: string): Promise<void> {
+    try {
+      const app = getApps().length === 0 ? initializeApp(environment.firebase) : getApp();
+      const db = getFirestore(app);
+      const userRef = doc(db, 'usuarios', userId);
+
+      await setDoc(
+        userRef,
+        {
+          nombre: playerName,
+          puntos: 0,
+          unlockedMysteries: [],
+          fechaCreacion: new Date(),
+        },
+        { merge: true },
+      );
+
+      console.log('✅ Jugador registrado:', playerName);
+    } catch (error) {
+      console.error('❌ Error al registrar jugador:', error);
+    }
+  }
 }
