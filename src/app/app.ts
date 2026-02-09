@@ -61,10 +61,17 @@ export class App {
     unlockedMysteries: [],
   };
 
-  // ✅ NUEVO: Variables para controlar el rastreo de ubicación
   private watchId: number | null = null;
   private locationAttempts = 0;
   private maxLocationAttempts = 3;
+
+  // ✅ NUEVO: Variables para carga progresiva
+  private visibleMysteries: Set<string> = new Set();
+  private loadedMysteries: Set<string> = new Set();
+  private INITIAL_LOAD_DISTANCE = 5000; // 5km inicial
+  private LOAD_MORE_DISTANCE = 10000; // 10km para cargar más
+  private BATCH_SIZE = 5; // Cargar de 5 en 5
+  private currentUserLocation: any = null;
 
   constructor() {
     window.checkAnswerPopup = (titulo: string) => {
@@ -107,6 +114,25 @@ export class App {
 
   toggleUserMenu() {
     this.showUserMenu.update((v) => !v);
+  }
+
+goToCurrentLocation() {
+    if (this.currentUserLocation && this.map) {
+      // Usamos la ubicación que el mapa ya está rastreando en tiempo real
+      this.map.setView(this.currentUserLocation, 16, {
+        animate: true,
+        duration: 1
+      });
+    } else if (navigator.geolocation) {
+      // Fallback por si acaso el rastreo aún no ha empezado
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        const newPos = this.L.latLng(latitude, longitude);
+        this.map.setView(newPos, 16);
+      }, (error) => {
+        console.error('Error al obtener ubicación:', error);
+      }, { enableHighAccuracy: true });
+    }
   }
 
   logout() {
@@ -250,87 +276,86 @@ export class App {
   }
 
   validarDesdePopup(titulo: string, respuestaUser: string) {
-  const misterio = this.misteriosList.find((m) => m.titulo === titulo);
+    const misterio = this.misteriosList.find((m) => m.titulo === titulo);
 
-  if (!misterio) {
-    alert('Error: Misterio no encontrado');
-    return;
-  }
-
-  console.log('🔍 Validando:');
-  console.log('   Usuario escribió:', respuestaUser.toLowerCase());
-  console.log('   Respuesta correcta:', misterio.respuesta.toLowerCase());
-
-  if (respuestaUser.toLowerCase() === misterio.respuesta.toLowerCase()) {
-    console.log('✅ ¡Respuesta correcta!');
-
-    this.map.closePopup();
-    misterio.desbloqueado = true;
-
-    this.ngZone.run(() => {
-      this.solvedMysteryTitle.set(misterio.titulo);
-      this.earnedPoints.set(50);
-      this.showSuccessModal.set(true);
-
-      console.log('🎉 Modal activado:', {
-        show: this.showSuccessModal(),
-        title: this.solvedMysteryTitle(),
-        points: this.earnedPoints(),
-      });
-
-      this.totalPoints.update((p) => p + 50);
-      this.cdr.detectChanges();
-    });
-
-    const marker = this.markers.get(misterio.id);
-    if (marker && this.L) {
-      const unlockedIcon = this.L.icon({
-        iconUrl: 'assets/unlocked.png',
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-      });
-
-      marker.setIcon(unlockedIcon);
-
-      // ✅ OPTIMIZADO: Popup con imagen lazy loading y placeholder
-      const popupContent = `
-        <div class="popup-info" style="width: 220px; padding: 10px;">
-          <div style="width: 100%; height: 120px; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
-            <div style="position: absolute; color: #d4af37; font-size: 32px;">🔓</div>
-            <img src="${misterio.imagen}" 
-                 loading="lazy"
-                 style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.3s;"
-                 onload="this.style.opacity='1'"
-                 onerror="this.style.display='none'"
-                 alt="${misterio.titulo}">
-          </div>
-          <h3 style="margin: 0 0 8px 0; color: #d4af37;">${misterio.titulo}</h3>
-          <p style="font-size: 13px; line-height: 1.4; margin: 0;">${misterio.descripcion}</p>
-        </div>`;
-      marker.bindPopup(popupContent);
+    if (!misterio) {
+      alert('Error: Misterio no encontrado');
+      return;
     }
 
-    Promise.all([
-      this.mysteryService.unlockMystery(this.userId, misterio.id),
-      this.mysteryService.addPoints(this.userId, 50),
-    ])
-      .then(() => {
-        console.log('✅ Progreso guardado en Firebase');
-        this.loadRanking();
-      })
-      .catch((err) => {
-        console.error('❌ Error al guardar:', err);
+    console.log('🔍 Validando:');
+    console.log('   Usuario escribió:', respuestaUser.toLowerCase());
+    console.log('   Respuesta correcta:', misterio.respuesta.toLowerCase());
+
+    if (respuestaUser.toLowerCase() === misterio.respuesta.toLowerCase()) {
+      console.log('✅ ¡Respuesta correcta!');
+
+      this.map.closePopup();
+      misterio.desbloqueado = true;
+
+      this.ngZone.run(() => {
+        this.solvedMysteryTitle.set(misterio.titulo);
+        this.earnedPoints.set(50);
+        this.showSuccessModal.set(true);
+
+        console.log('🎉 Modal activado:', {
+          show: this.showSuccessModal(),
+          title: this.solvedMysteryTitle(),
+          points: this.earnedPoints(),
+        });
+
+        this.totalPoints.update((p) => p + 50);
+        this.cdr.detectChanges();
       });
-  } else {
-    console.log('❌ Respuesta incorrecta');
-    alert('Respuesta incorrecta. ¡Sigue intentándolo!');
-    const inputElement = document.getElementById(`ans-${titulo}`) as HTMLInputElement;
-    if (inputElement) {
-      inputElement.value = '';
-      inputElement.focus();
+
+      const marker = this.markers.get(misterio.id);
+      if (marker && this.L) {
+        const unlockedIcon = this.L.icon({
+          iconUrl: 'assets/unlocked.png',
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+        });
+
+        marker.setIcon(unlockedIcon);
+
+        const popupContent = `
+          <div class="popup-info" style="width: 220px; padding: 10px;">
+            <div style="width: 100%; height: 120px; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+              <div style="position: absolute; color: #d4af37; font-size: 32px;">🔓</div>
+              <img src="${misterio.imagen}" 
+                   loading="lazy"
+                   style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.3s;"
+                   onload="this.style.opacity='1'"
+                   onerror="this.style.display='none'"
+                   alt="${misterio.titulo}">
+            </div>
+            <h3 style="margin: 0 0 8px 0; color: #d4af37;">${misterio.titulo}</h3>
+            <p style="font-size: 13px; line-height: 1.4; margin: 0;">${misterio.descripcion}</p>
+          </div>`;
+        marker.bindPopup(popupContent);
+      }
+
+      Promise.all([
+        this.mysteryService.unlockMystery(this.userId, misterio.id),
+        this.mysteryService.addPoints(this.userId, 50),
+      ])
+        .then(() => {
+          console.log('✅ Progreso guardado en Firebase');
+          this.loadRanking();
+        })
+        .catch((err) => {
+          console.error('❌ Error al guardar:', err);
+        });
+    } else {
+      console.log('❌ Respuesta incorrecta');
+      alert('Respuesta incorrecta. ¡Sigue intentándolo!');
+      const inputElement = document.getElementById(`ans-${titulo}`) as HTMLInputElement;
+      if (inputElement) {
+        inputElement.value = '';
+        inputElement.focus();
+      }
     }
   }
-}
 
   closeSuccessModal() {
     this.showSuccessModal.set(false);
@@ -353,158 +378,277 @@ export class App {
     }
   }
 
-  // ✅ CORREGIDO: Mejor manejo de geolocalización con reintentos
-async initMap(L: any): Promise<void> {
-  return new Promise((resolve) => {
-    if (navigator.geolocation) {
-      console.log('🔍 Solicitando permisos de geolocalización...');
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          console.log('✅ Ubicación inicial obtenida:', latitude, longitude);
-          this.finishMapSetup(L, latitude, longitude);
-          resolve();
-        },
-        (error) => {
-          console.error('❌ Error de geolocalización:', error.message, error.code);
-          // Usar ubicación por defecto (Bilbao)
-          this.finishMapSetup(L, 43.263, -2.935);
-          resolve();
-        },
-        { 
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        },
-      );
-    } else {
-      console.warn('⚠️ Geolocalización no disponible en este navegador');
-      this.finishMapSetup(L, 43.263, -2.935);
-      resolve();
-    }
-  });
-}
-
-private finishMapSetup(L: any, lat: number, lng: number) {
-  console.log('🗺️ Configurando mapa en:', lat, lng);
-  
-  this.map = L.map('map', {
-    center: [lat, lng],
-    zoom: 14,
-    zoomControl: false,
-  });
-
-  const iconDefault = L.icon({
-    iconRetinaUrl: '/leaflet/marker-icon-2x.png',
-    iconUrl: '/leaflet/marker-icon.png',
-    shadowUrl: '/leaflet/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-  });
-  L.Marker.prototype.options.icon = iconDefault;
-
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap',
-    className: 'map-lighter',
-  }).addTo(this.map);
-
-  console.log('📍 Creando marcador de jugador en:', lat, lng);
-  this.playerMarker = L.circleMarker([lat, lng], {
-    radius: 10,
-    color: '#ffffff',
-    fillColor: '#007bff',
-    fillOpacity: 1,
-    weight: 3,
-  }).addTo(this.map);
-
-  // ✅ CORREGIDO: Watchear ubicación con configuración más tolerante
-  this.map.locate({
-    setView: false,
-    watch: true,
-    enableHighAccuracy: true,
-    maximumAge: 30000, // ✅ Permitir ubicación de hasta 30 segundos
-    timeout: 30000, // ✅ Aumentar timeout a 30 segundos
-  });
-
-  // ✅ Manejar actualizaciones de ubicación
-  this.map.on('locationfound', (e: any) => {
-    console.log('📍 Ubicación actualizada:', e.latlng.lat, e.latlng.lng, 'Precisión:', e.accuracy + 'm');
-    
-    if (this.playerMarker) {
-      this.playerMarker.setLatLng(e.latlng);
-    }
-    
-    this.updateMysteriesDistance(e.latlng);
-  });
-
-  // ✅ CORREGIDO: Manejar errores sin spam en consola
-  this.map.on('locationerror', (e: any) => {
-    // Solo mostrar warning, no error
-    console.warn('⚠️ Timeout de ubicación (es normal, seguirá intentando):', e.message);
-    // El mapa seguirá intentando obtener la ubicación automáticamente
-  });
-}
-
-  // ✅ NUEVO: Función separada para rastrear ubicación con mejor manejo de errores
- private startLocationTracking() {
-  if (!navigator.geolocation) {
-    console.warn('⚠️ No se puede rastrear ubicación: geolocalización no disponible');
-    return;
+  async initMap(L: any): Promise<void> {
+    return new Promise((resolve) => {
+      if (navigator.geolocation) {
+        console.log('🔍 Solicitando permisos de geolocalización...');
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            console.log('✅ Ubicación inicial obtenida:', latitude, longitude);
+            this.finishMapSetup(L, latitude, longitude);
+            resolve();
+          },
+          (error) => {
+            console.error('❌ Error de geolocalización:', error.message, error.code);
+            this.finishMapSetup(L, 43.263, -2.935);
+            resolve();
+          },
+          { 
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          },
+        );
+      } else {
+        console.warn('⚠️ Geolocalización no disponible en este navegador');
+        this.finishMapSetup(L, 43.263, -2.935);
+        resolve();
+      }
+    });
   }
 
-  console.log('🎯 Iniciando rastreo continuo de ubicación...');
+  private finishMapSetup(L: any, lat: number, lng: number) {
+    console.log('🗺️ Configurando mapa en:', lat, lng);
+    
+    this.map = L.map('map', {
+      center: [lat, lng],
+      zoom: 14,
+      zoomControl: false,
+    });
 
-  this.watchId = navigator.geolocation.watchPosition(
-    (position) => {
-      const { latitude, longitude, accuracy } = position.coords;
-      console.log('📍 Ubicación actualizada:', latitude, longitude, 'Precisión:', accuracy + 'm');
-      
-      this.locationAttempts = 0;
-      
-      if (this.playerMarker && this.L) {
-        const newPos = this.L.latLng(latitude, longitude);
-        this.playerMarker.setLatLng(newPos);
-        this.updateMysteriesDistance(newPos);
-      }
-    },
-    (error) => {
-      this.locationAttempts++;
-      console.error(`❌ Error al rastrear ubicación (intento ${this.locationAttempts}):`, error.message);
-      
-      // ✅ Solo reiniciar si hay muchos errores consecutivos
-      if (this.locationAttempts >= this.maxLocationAttempts) {
-        console.warn('⚠️ Reiniciando rastreo...');
-        this.stopLocationTracking();
-        
-        setTimeout(() => {
-          this.locationAttempts = 0;
-          this.startLocationTracking();
-        }, 5000);
-      }
-    },
-    {
+    const iconDefault = L.icon({
+      iconRetinaUrl: '/leaflet/marker-icon-2x.png',
+      iconUrl: '/leaflet/marker-icon.png',
+      shadowUrl: '/leaflet/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41],
+    });
+    L.Marker.prototype.options.icon = iconDefault;
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap',
+      className: 'map-lighter',
+    }).addTo(this.map);
+
+    console.log('📍 Creando marcador de jugador en:', lat, lng);
+    this.playerMarker = L.circleMarker([lat, lng], {
+      radius: 10,
+      color: '#ffffff',
+      fillColor: '#007bff',
+      fillOpacity: 1,
+      weight: 3,
+    }).addTo(this.map);
+
+    // ✅ Guardar ubicación inicial
+    this.currentUserLocation = L.latLng(lat, lng);
+
+    this.map.locate({
+      setView: false,
+      watch: true,
       enableHighAccuracy: true,
-      timeout: 15000, // ✅ 15 segundos
-      maximumAge: 5000 // ✅ Permitir ubicación de hasta 5 segundos
-    }
-  );
+      maximumAge: 30000,
+      timeout: 30000,
+    });
 
-  console.log('✅ Rastreo iniciado');
-}
+    this.map.on('locationfound', (e: any) => {
+      console.log('📍 Ubicación actualizada:', e.latlng.lat, e.latlng.lng, 'Precisión:', e.accuracy + 'm');
+      
+      if (this.playerMarker) {
+        this.playerMarker.setLatLng(e.latlng);
+      }
+      
+      this.currentUserLocation = e.latlng;
+      this.updateMysteriesDistance(e.latlng);
+      
+      // ✅ NUEVO: Cargar más misterios cuando el usuario se mueve
+      this.loadNearbyMysteries(e.latlng);
+    });
 
-  // ✅ NUEVO: Detener rastreo de ubicación
-private stopLocationTracking() {
-  if (this.watchId !== null) {
-    navigator.geolocation.clearWatch(this.watchId);
-    console.log('🛑 Rastreo detenido');
-    this.watchId = null;
+    this.map.on('locationerror', (e: any) => {
+      console.warn('⚠️ Timeout de ubicación (es normal, seguirá intentando):', e.message);
+    });
+
+    // ✅ NUEVO: Cargar misterios al mover/hacer zoom en el mapa
+    this.map.on('moveend', () => {
+      this.loadVisibleMysteries();
+    });
   }
-}
+
+  private startLocationTracking() {
+    if (!navigator.geolocation) {
+      console.warn('⚠️ No se puede rastrear ubicación: geolocalización no disponible');
+      return;
+    }
+
+    console.log('🎯 Iniciando rastreo continuo de ubicación...');
+
+    this.watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const { latitude, longitude, accuracy } = position.coords;
+        console.log('📍 Ubicación actualizada:', latitude, longitude, 'Precisión:', accuracy + 'm');
+        
+        this.locationAttempts = 0;
+        
+        if (this.playerMarker && this.L) {
+          const newPos = this.L.latLng(latitude, longitude);
+          this.playerMarker.setLatLng(newPos);
+          this.currentUserLocation = newPos;
+          this.updateMysteriesDistance(newPos);
+          
+          // ✅ NUEVO: Cargar misterios cercanos
+          this.loadNearbyMysteries(newPos);
+        }
+      },
+      (error) => {
+        this.locationAttempts++;
+        console.error(`❌ Error al rastrear ubicación (intento ${this.locationAttempts}):`, error.message);
+        
+        if (this.locationAttempts >= this.maxLocationAttempts) {
+          console.warn('⚠️ Reiniciando rastreo...');
+          this.stopLocationTracking();
+          
+          setTimeout(() => {
+            this.locationAttempts = 0;
+            this.startLocationTracking();
+          }, 5000);
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 5000
+      }
+    );
+
+    console.log('✅ Rastreo iniciado');
+  }
+
+  private stopLocationTracking() {
+    if (this.watchId !== null) {
+      navigator.geolocation.clearWatch(this.watchId);
+      console.log('🛑 Rastreo detenido');
+      this.watchId = null;
+    }
+  }
+
+  // ✅ NUEVO: Calcular distancia entre dos puntos
+  private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    if (this.L) {
+      const pos1 = this.L.latLng(lat1, lon1);
+      const pos2 = this.L.latLng(lat2, lon2);
+      return pos1.distanceTo(pos2);
+    }
+    return Infinity;
+  }
+
+  // ✅ NUEVO: Cargar solo misterios cercanos progresivamente
+  private loadNearbyMysteries(userLocation: any) {
+    if (!this.L || this.misteriosList.length === 0) return;
+
+    // Encontrar misterios no cargados que estén cerca
+    const mysteriesToLoad = this.misteriosList
+      .filter(m => !this.loadedMysteries.has(m.id))
+      .map(m => ({
+        ...m,
+        distance: this.calculateDistance(
+          userLocation.lat,
+          userLocation.lng,
+          m.latitud,
+          m.longitud
+        )
+      }))
+      .filter(m => m.distance < this.LOAD_MORE_DISTANCE)
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, this.BATCH_SIZE);
+
+    if (mysteriesToLoad.length > 0) {
+      console.log(`🎯 Cargando ${mysteriesToLoad.length} misterios cercanos...`);
+      
+      mysteriesToLoad.forEach(m => {
+        this.addMysteryMarker(m);
+        this.loadedMysteries.add(m.id);
+      });
+    }
+  }
+
+  // ✅ NUEVO: Cargar misterios visibles en el viewport del mapa
+  private loadVisibleMysteries() {
+    if (!this.map || !this.L || this.misteriosList.length === 0) return;
+
+    const bounds = this.map.getBounds();
+    let loadedCount = 0;
+
+    this.misteriosList.forEach(m => {
+      if (!this.loadedMysteries.has(m.id)) {
+        const mysteryPos = this.L.latLng(m.latitud, m.longitud);
+        
+        if (bounds.contains(mysteryPos)) {
+          this.addMysteryMarker(m);
+          this.loadedMysteries.add(m.id);
+          loadedCount++;
+        }
+      }
+    });
+
+    if (loadedCount > 0) {
+      console.log(`🗺️ Cargados ${loadedCount} misterios en viewport`);
+    }
+  }
+
+  // ✅ NUEVO: Añadir un marcador individual
+  private addMysteryMarker(mystery: any) {
+    if (!this.L || !this.map || this.markers.has(mystery.id)) return;
+
+    const lockedIcon = this.L.icon({
+      iconUrl: 'assets/locked.png',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+    });
+
+    const unlockedIcon = this.L.icon({
+      iconUrl: 'assets/unlocked.png',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+    });
+
+    const mysteryPos = this.L.latLng(mystery.latitud, mystery.longitud);
+    const initialIcon = mystery.desbloqueado ? unlockedIcon : lockedIcon;
+    const marker = this.L.marker(mysteryPos, { icon: initialIcon }).addTo(this.map);
+
+    this.markers.set(mystery.id, marker);
+
+    if (mystery.desbloqueado) {
+      const popupContent = `
+        <div class="popup-info" style="width: 220px; padding: 10px;">
+          <div style="width: 100%; height: 120px; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+            <div style="position: absolute; color: #d4af37; font-size: 32px;">🔓</div>
+            <img src="${mystery.imagen}" 
+                 loading="lazy"
+                 style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top: 0; left: 0;"
+                 onload="this.style.opacity='1'"
+                 onerror="this.style.display='none'"
+                 alt="${mystery.titulo}">
+          </div>
+          <h3 style="margin: 0 0 8px 0; color: #d4af37;">${mystery.titulo}</h3>
+          <p style="font-size: 13px; line-height: 1.4; margin: 0;">${mystery.descripcion}</p>
+        </div>`;
+      marker.bindPopup(popupContent);
+    } else {
+      marker.bindPopup(`
+        <div style="text-align: center; padding: 10px;">
+          <b>🔒 Bloqueado</b><br>
+          <span style="font-size: 12px;">Acércate a ${mystery.radioDesbloqueo || 50}m para desbloquear</span>
+        </div>`);
+    }
+
+    console.log(`📍 Marcador añadido: ${mystery.titulo}`);
+  }
+
   updateMysteriesDistance(userLocation: any) {
     if (!this.L || this.misteriosList.length === 0) {
-      console.log('⚠️ No se puede actualizar distancias: mapa o lista vacía');
       return;
     }
 
@@ -514,30 +658,21 @@ private stopLocationTracking() {
       iconAnchor: [16, 32],
     });
 
-    console.log('🔄 Actualizando distancias de', this.misteriosList.length, 'misterios...');
-
-    this.misteriosList.forEach((m) => {
-      if (m.desbloqueado) {
-        return;
-      }
+    // ✅ OPTIMIZADO: Solo actualizar misterios cargados
+    this.loadedMysteries.forEach(mysteryId => {
+      const m = this.misteriosList.find(mystery => mystery.id === mysteryId);
+      if (!m || m.desbloqueado) return;
 
       const marker = this.markers.get(m.id);
-      if (!marker) {
-        console.warn(`⚠️ No se encontró marcador para ${m.titulo}`);
-        return;
-      }
+      if (!marker) return;
 
       const mysteryPos = this.L.latLng(m.latitud, m.longitud);
       const distance = userLocation.distanceTo(mysteryPos);
       const unlockRadius = m.radioDesbloqueo || 50;
 
-      console.log(`📍 ${m.titulo}: ${Math.round(distance)}m de ${unlockRadius}m - Desbloqueado: ${m.desbloqueado}`);
-
       marker.setIcon(lockedIcon);
 
       if (distance < unlockRadius) {
-        console.log(`🔓 ${m.titulo} está DESBLOQUEADO (${Math.round(distance)}m)`);
-        
         const popupContent = `
           <div class="popup-mystery" style="padding: 12px; text-align: center; min-width: 200px;">
             <h3 style="color: #d4af37; margin: 0 0 10px 0; font-size: 16px;">🔍 ${m.titulo}</h3>
@@ -552,8 +687,6 @@ private stopLocationTracking() {
           </div>`;
         marker.bindPopup(popupContent);
       } else {
-        console.log(`🔒 ${m.titulo} está BLOQUEADO (${Math.round(distance)}m)`);
-        
         marker.bindPopup(`
           <div style="text-align: center; padding: 10px;">
             <b>🔒 Bloqueado</b><br>
@@ -572,76 +705,54 @@ private stopLocationTracking() {
   }
 
   loadMysteries(L: any) {
-  if (!this.map) {
-    console.error('❌ El mapa no está inicializado');
-    return;
-  }
+    if (!this.map) {
+      console.error('❌ El mapa no está inicializado');
+      return;
+    }
 
-  const lockedIcon = L.icon({
-    iconUrl: 'assets/locked.png',
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-  });
+    this.mysteryService.getMysteries().subscribe((misterios) => {
+      console.log('📦 Misterios cargados desde Firebase:', misterios.length);
 
-  const unlockedIcon = L.icon({
-    iconUrl: 'assets/unlocked.png',
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-  });
+      this.misteriosList = misterios.map((m) => ({
+        ...m,
+        desbloqueado: this.userProgress.unlockedMysteries.includes(m.id),
+      }));
 
-  this.mysteryService.getMysteries().subscribe((misterios) => {
-    console.log('📦 Misterios cargados:', misterios);
+      // ✅ Limpiar marcadores existentes
+      this.markers.forEach((marker) => {
+        this.map.removeLayer(marker);
+      });
+      this.markers.clear();
+      this.loadedMysteries.clear();
 
-    this.misteriosList = misterios.map((m) => ({
-      ...m,
-      desbloqueado: this.userProgress.unlockedMysteries.includes(m.id),
-    }));
+      // ✅ OPTIMIZADO: Cargar solo misterios iniciales (cercanos o desbloqueados)
+      if (this.currentUserLocation) {
+        // Cargar misterios desbloqueados primero
+        const unlockedMysteries = this.misteriosList.filter(m => m.desbloqueado);
+        unlockedMysteries.forEach(m => {
+          this.addMysteryMarker(m);
+          this.loadedMysteries.add(m.id);
+        });
 
-    this.markers.forEach((marker) => {
-      this.map.removeLayer(marker);
-    });
-    this.markers.clear();
-
-    this.misteriosList.forEach((m) => {
-      console.log(`${m.titulo} - Desbloqueado: ${m.desbloqueado} - Radio: ${m.radioDesbloqueo}m - Pos: (${m.latitud}, ${m.longitud})`);
-
-      const mysteryPos = L.latLng(m.latitud, m.longitud);
-      const initialIcon = m.desbloqueado ? unlockedIcon : lockedIcon;
-      const marker = L.marker(mysteryPos, { icon: initialIcon }).addTo(this.map);
-
-      this.markers.set(m.id, marker);
-
-      if (m.desbloqueado) {
-        // ✅ OPTIMIZADO: Popup con imagen lazy loading y placeholder
-        const popupContent = `
-          <div class="popup-info" style="width: 220px; padding: 10px;">
-            <div style="width: 100%; height: 120px; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
-              <div style="position: absolute; color: #d4af37; font-size: 32px;">🔓</div>
-              <img src="${m.imagen}" 
-                   loading="lazy"
-                   style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top: 0; left: 0;"
-                   onload="this.style.opacity='1'"
-                   onerror="this.style.display='none'"
-                   alt="${m.titulo}">
-            </div>
-            <h3 style="margin: 0 0 8px 0; color: #d4af37;">${m.titulo}</h3>
-            <p style="font-size: 13px; line-height: 1.4; margin: 0;">${m.descripcion}</p>
-          </div>`;
-        marker.bindPopup(popupContent);
+        // Cargar misterios cercanos (dentro de 5km inicial)
+        this.loadNearbyMysteries(this.currentUserLocation);
+        
+        console.log(`✅ Carga inicial: ${unlockedMysteries.length} desbloqueados + misterios cercanos`);
       } else {
-        marker.bindPopup(`
-          <div style="text-align: center; padding: 10px;">
-            <b>🔒 Bloqueado</b><br>
-            <span style="font-size: 12px;">Acércate a ${m.radioDesbloqueo || 50}m para desbloquear</span>
-          </div>`);
+        // Si no hay ubicación, cargar solo los primeros 10
+        this.misteriosList.slice(0, 10).forEach(m => {
+          this.addMysteryMarker(m);
+          this.loadedMysteries.add(m.id);
+        });
+        
+        console.log('✅ Carga inicial: primeros 10 misterios (sin ubicación)');
+      }
+
+      // Actualizar distancias si tenemos ubicación
+      if (this.playerMarker) {
+        const userLocation = this.playerMarker.getLatLng();
+        this.updateMysteriesDistance(userLocation);
       }
     });
-
-    if (this.playerMarker) {
-      const userLocation = this.playerMarker.getLatLng();
-      console.log('🔄 Actualizando distancias iniciales desde:', userLocation);
-      this.updateMysteriesDistance(userLocation);
-    }
-  });
-}
+  }
 }
