@@ -1120,3 +1120,66 @@
     }
   }
 }
+
+/* ============================================
+   FIX ESPECÍFICO HONOR MAGIC V5 Y SIMILARES
+   ============================================ */
+
+/* Honor Magic V5 cerrado (340-360px ancho) */
+@media (min-width: 340px) and (max-width: 360px) {
+  .welcome-card {
+    padding: 10px 14px !important;
+    width: 96% !important;
+
+    .mystery-logo {
+      width: 42px !important;
+      margin: 0 auto 4px !important;
+    }
+
+    .mystery-title {
+      font-size: 1.2rem !important;
+      margin-bottom: 3px !important;
+      line-height: 1.1;
+    }
+
+    .description-box {
+      font-size: 0.68rem !important;
+      margin: 4px 0 !important;
+      line-height: 1.2;
+
+      p {
+        margin-bottom: 2px !important;
+      }
+      
+      ul {
+        padding-left: 10px;
+        li {
+          margin-bottom: 1px !important;
+        }
+      }
+    }
+
+    .name-input, .auth-input {
+      padding: 6px 8px !important;
+      margin: 4px 0 !important;
+      font-size: 0.72rem !important;
+    }
+
+    .start-button {
+      padding: 6px 16px !important;
+      font-size: 0.72rem !important;
+      margin-top: 4px !important;
+    }
+
+    .toggle-mode-btn {
+      margin-top: 4px !important;
+      padding: 5px !important;
+      font-size: 0.65rem !important;
+    }
+
+    .error-message {
+      font-size: 0.7rem !important;
+      padding: 6px !important;
+    }
+  }
+}
