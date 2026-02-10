@@ -26,6 +26,9 @@ declare global {
   styleUrl: './app.scss',
 })
 export class App {
+
+
+
   showWelcome = signal(true);
   showInstructions = signal(false); // ✅ NUEVO
   private mysteryService = inject(MysteryService);
@@ -924,4 +927,68 @@ export class App {
       }
     });
   }
+
+  // Añadir al final de la clase, antes del último }
+
+testVibration() {
+  try {
+    const nav = navigator as any;
+    if (nav.vibrate) {
+      nav.vibrate([300, 100, 300, 100, 300]);
+      alert('✅ Vibración ejecutada! Si no sentiste nada, tu dispositivo no la soporta.');
+    } else {
+      alert('❌ Tu navegador NO soporta vibración');
+    }
+  } catch (e) {
+    alert('❌ Error: ' + e);
+  }
+}
+
+async testNotification() {
+  try {
+    // Pedir permisos si no están concedidos
+    if (Notification.permission !== 'granted') {
+      const permission = await Notification.requestPermission();
+      alert('Permiso de notificación: ' + permission);
+      
+      if (permission !== 'granted') {
+        alert('❌ Debes permitir las notificaciones en la configuración del navegador');
+        return;
+      }
+    }
+    
+    // ✅ Se añade 'as any' para evitar el error de TypeScript con 'vibrate'
+    const notification = new Notification('🎉 Test Mystery Hunter', {
+      body: 'Si ves esto, las notificaciones funcionan perfectamente!',
+      icon: '/assets/logoMistery.png',
+      vibrate: [200, 100, 200]
+    } as any);
+    
+    setTimeout(() => notification.close(), 4000);
+    alert('✅ Notificación enviada! Revisa la barra de notificaciones.');
+    
+  } catch (e) {
+    alert('❌ Error: ' + (e as Error).message);
+  }
+}
+
+
+checkPermissions() {
+  const locationPerm = 'geolocation' in navigator ? '✅ Disponible' : '❌ No disponible';
+  const notificationPerm = Notification.permission;
+  const swSupported = 'serviceWorker' in navigator ? '✅ Soportado' : '❌ No soportado';
+  
+  const vibrationTest = (navigator as any).vibrate ? '✅ Soportado' : '❌ No soportado';
+  
+  alert(`
+📱 ESTADO DE PERMISOS:
+
+🌍 Geolocalización: ${locationPerm}
+🔔 Notificaciones: ${notificationPerm}
+📳 Vibración: ${vibrationTest}
+⚙️ Service Worker: ${swSupported}
+
+NAVEGADOR: ${navigator.userAgent.split(' ').slice(-1)[0]}
+  `.trim());
+}
 }
