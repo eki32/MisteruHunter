@@ -822,8 +822,11 @@ export class App {
       else if (distance < unlockRadius && isLocationReliable) {
         if (!this.vibratedMysteries.has(m.id)) {
           // Vibración mucho más larga para indicar que "ya puede jugar"
-          this.vibrar([500, 100, 500, 100, 500]);
-          this.vibratedMysteries.add(m.id);
+          this.vibrar([500, 100, 500]);
+          //this.vibratedMysteries.add(m.id);
+
+          this.mostrarNotificacionProximidad(m, distance);
+          this.notifiedMysteries.add(m.id);
 
           // Opcional: Auto-abrir el popup al llegar
           marker.openPopup();
