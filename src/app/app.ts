@@ -751,7 +751,7 @@ export class App {
       // Cast a 'any' para evitar que TS valide las propiedades contra la interfaz estándar
       const notification = new Notification('📍 ¡Misterio Cerca!', {
         body: `Estás a ${Math.round(distance)}m de "${mystery.titulo}". ¡Acércate más!`,
-        icon: '/assets/logoMistery.png',
+        icon: '/public/logoMistery.png',
         badge: '/assets/locked.png',
         tag: `proximity-${mystery.id}`,
         requireInteraction: false,
@@ -891,9 +891,9 @@ updateMysteriesDistance(userLocation: any) {
   try {
     if ('serviceWorker' in navigator) {
       const registration = await navigator.serviceWorker.ready;
-      await registration.showNotification('🎉 Test Mystery Hunter', {
-        body: '¡Notificación con el detective activa!',
-        icon: 'assets/detective.png', // ✅ Tu icono aquí
+      await registration.showNotification('🔍 Test Mystery Hunter', {
+        body: '¡Nuevo misterio cerca por resolver!',
+        icon: '/public/logoMistery.png', // ✅ Tu icono aquí
         vibrate: [200, 100, 200],
         tag: 'test-notification'
       } as any);
