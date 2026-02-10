@@ -944,51 +944,70 @@ testVibration() {
   }
 }
 
+// ✅ TEST DE NOTIFICACIÓN USANDO SERVICE WORKER (Recomendado por el navegador)
 async testNotification() {
   try {
-    // Pedir permisos si no están concedidos
+    // 1. Verificar/Pedir permisos
     if (Notification.permission !== 'granted') {
       const permission = await Notification.requestPermission();
-      alert('Permiso de notificación: ' + permission);
-      
       if (permission !== 'granted') {
-        alert('❌ Debes permitir las notificaciones en la configuración del navegador');
+        alert('❌ Debes permitir las notificaciones para probar esta función.');
         return;
       }
     }
-    
-    // ✅ Se añade 'as any' para evitar el error de TypeScript con 'vibrate'
-    const notification = new Notification('🎉 Test Mystery Hunter', {
-      body: 'Si ves esto, las notificaciones funcionan perfectamente!',
-      icon: '/assets/logoMistery.png',
-      vibrate: [200, 100, 200]
-    } as any);
-    
-    setTimeout(() => notification.close(), 4000);
-    alert('✅ Notificación enviada! Revisa la barra de notificaciones.');
-    
+
+    // 2. Intentar usar Service Worker (la forma moderna que pide el navegador)
+    if ('serviceWorker' in navigator) {
+      const registration = await navigator.serviceWorker.ready;
+      
+      // ✅ Esta API permite vibración real y es la que no lanza el warning
+      await registration.showNotification('🎉 Test Mystery Hunter', {
+        body: '¡Notificación vía Service Worker activa!',
+        icon: '/assets/logoMistery.png',
+        badge: '/assets/locked.png',
+        vibrate: [200, 100, 200], // Patrón de vibración
+        tag: 'test-notification',
+        renotify: true
+      } as any);
+
+      alert('✅ Notificación enviada vía Service Worker');
+    } else {
+      // Fallback si no hay Service Worker (solo para navegadores muy viejos)
+      const notification = new Notification('🎉 Test (Simple)', {
+        body: 'Notificación simple sin Service Worker',
+        icon: '/assets/logoMistery.png'
+      } as any);
+      alert('✅ Notificación simple enviada');
+    }
   } catch (e) {
+    console.error('❌ Error en testNotification:', e);
     alert('❌ Error: ' + (e as Error).message);
   }
 }
 
-
-checkPermissions() {
+// ✅ ESTADO DE PERMISOS MEJORADO
+async checkPermissions() {
   const locationPerm = 'geolocation' in navigator ? '✅ Disponible' : '❌ No disponible';
   const notificationPerm = Notification.permission;
   const swSupported = 'serviceWorker' in navigator ? '✅ Soportado' : '❌ No soportado';
-  
   const vibrationTest = (navigator as any).vibrate ? '✅ Soportado' : '❌ No soportado';
   
+  let swStatus = 'No detectado';
+  if ('serviceWorker' in navigator) {
+    const reg = await navigator.serviceWorker.getRegistration();
+    swStatus = reg ? `✅ Activo (${reg.scope})` : '⚠️ Registrado pero no activo';
+  }
+
   alert(`
-📱 ESTADO DE PERMISOS:
+📱 ESTADO DEL SISTEMA:
 
 🌍 Geolocalización: ${locationPerm}
 🔔 Notificaciones: ${notificationPerm}
 📳 Vibración: ${vibrationTest}
 ⚙️ Service Worker: ${swSupported}
+🛠️ SW Status: ${swStatus}
 
-NAVEGADOR: ${navigator.userAgent.split(' ').slice(-1)[0]}
+Precisión GPS: ${this.lastAccuracy ? Math.round(this.lastAccuracy) + 'm' : 'Sin datos'}
   `.trim());
 }
 }
