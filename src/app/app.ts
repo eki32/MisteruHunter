@@ -81,22 +81,19 @@ export class App {
   private isLoggingOut: boolean = false; // ✅ Flag para evitar vibraciones durante logout
 
   // Helper para vibración compatible con TypeScript
-  private vibrar(pattern: number | number[]): void {
-    // ✅ No vibrar si estamos haciendo logout o en pantallas de bienvenida/instrucciones
-    if (this.isLoggingOut || this.showWelcome()) return;
+private vibrar(pattern: number | number[]): void {
+  // Solo bloqueamos si el usuario está cerrando sesión
+  if (this.isLoggingOut) return; 
 
-    // ✅ No vibrar si no hay usuario logueado
-    if (!this.userId) return;
-
-    try {
-      const nav = navigator as any;
-      if (nav.vibrate) {
-        nav.vibrate(pattern);
-      }
-    } catch (e) {
-      console.log('Vibración no soportada');
+  try {
+    const nav = navigator as any;
+    if (nav.vibrate) {
+      nav.vibrate(pattern);
     }
+  } catch (e) {
+    console.log('Vibración no soportada');
   }
+}
 
   constructor() {
     window.checkAnswerPopup = (titulo: string) => {
