@@ -784,19 +784,22 @@ export class App {
           this.vibratedMysteries.add(m.id);
         }
 
-        const popupContent = `
-          <div class="popup-mystery" style="padding: 12px; text-align: center; min-width: 200px;">
-            <h3 style="color: #d4af37; margin: 0 0 10px 0; font-size: 16px;">🔍 ${m.titulo}</h3>
-            <p style="font-style: italic; margin: 10px 0; font-size: 14px; line-height: 1.4;">"${m.acertijo}"</p>
-            <p style="font-size: 11px; color: #4ade80; margin: 5px 0; font-weight: bold;">✓ Estás en el lugar correcto</p>
-            <input type="text" id="ans-${m.titulo}" placeholder="Respuesta..." 
-                   style="width: calc(100% - 16px); padding: 8px; margin: 10px 0; border: 2px solid #d4af37; border-radius: 6px;">
-            <button onclick="window.checkAnswerPopup('${m.titulo}')" 
-                    style="padding: 10px 20px; background: #d4af37; color: #1a1a1a; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;">
-              Resolver
-            </button>
-          </div>`;
-        marker.bindPopup(popupContent);
+        // ✅ IMPORTANTE: Solo actualizar el popup si NO está abierto (evita cerrar el teclado)
+        if (!marker.isPopupOpen()) {
+          const popupContent = `
+            <div class="popup-mystery" style="padding: 12px; text-align: center; min-width: 200px;">
+              <h3 style="color: #d4af37; margin: 0 0 10px 0; font-size: 16px;">🔍 ${m.titulo}</h3>
+              <p style="font-style: italic; margin: 10px 0; font-size: 14px; line-height: 1.4;">"${m.acertijo}"</p>
+              <p style="font-size: 11px; color: #4ade80; margin: 5px 0; font-weight: bold;">✓ Estás en el lugar correcto</p>
+              <input type="text" id="ans-${m.titulo}" placeholder="Respuesta..." 
+                     style="width: calc(100% - 16px); padding: 8px; margin: 10px 0; border: 2px solid #d4af37; border-radius: 6px;">
+              <button onclick="window.checkAnswerPopup('${m.titulo}')" 
+                      style="padding: 10px 20px; background: #d4af37; color: #1a1a1a; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;">
+                Resolver
+              </button>
+            </div>`;
+          marker.bindPopup(popupContent);
+        }
       } else if (distance < unlockRadius && !isLocationReliable) {
         marker.bindPopup(`
           <div style="text-align: center; padding: 10px;">
