@@ -733,7 +733,7 @@ export class App {
         // Enviar mensaje al Service Worker para que muestre la notificación
         registration.active?.postMessage({
           type: 'PROXIMITY_ALERT',
-          title: '📍 ¡Misterio Cerca!',
+          title: '❓ ¡Misterio Cerca!',
           body: `Estás a ${Math.round(distance)}m de "${mystery.titulo}". ¡Acércate más!`,
           mystery: { id: mystery.id, titulo: mystery.titulo }
         });
@@ -932,21 +932,5 @@ export class App {
         this.updateMysteriesDistance(userLocation);
       }
     });
-  }
-
-  async testNotification() {
-    try {
-      if ('serviceWorker' in navigator) {
-        const registration = await navigator.serviceWorker.ready;
-        await registration.showNotification('🔍 Test Mystery Hunter', {
-          body: '¡Nuevo misterio cerca por resolver!',
-          icon: '/logoMistery.png', // ✅ Tu icono aquí
-          vibrate: [200, 100, 200],
-          tag: 'test-notification',
-        } as any);
-      }
-    } catch (e) {
-      alert('❌ Error: ' + (e as Error).message);
-    }
   }
 }

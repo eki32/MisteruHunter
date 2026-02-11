@@ -1003,3 +1003,320 @@
   }
 }
 
+/* ============================================
+   FIX HONOR MAGIC V5 - PLEGADO Y DESPLEGADO
+   ============================================ */
+
+/* HONOR MAGIC V5 PLEGADO (pantalla externa ~260-280px de ancho útil) */
+@media screen and (max-width: 400px) and (max-height: 900px) {
+  
+  .welcome-overlay {
+    padding: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .welcome-card {
+    padding: 20px 16px !important;
+    width: 96% !important;
+    max-width: none !important;
+    min-height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+
+    .mystery-logo {
+      width: 70px !important;
+      height: auto !important;
+      margin: 0 auto 12px !important;
+      display: block !important;
+    }
+
+    .mystery-title {
+      font-size: 26px !important;
+      margin-bottom: 10px !important;
+      line-height: 1.2 !important;
+      word-wrap: break-word !important;
+    }
+
+    .description-box {
+      font-size: 14px !important;
+      margin: 12px 0 !important;
+      line-height: 1.5 !important;
+      text-align: left !important;
+
+      p {
+        margin-bottom: 10px !important;
+        word-wrap: break-word !important;
+      }
+      
+      ul {
+        padding-left: 24px !important;
+        margin: 10px 0 !important;
+        
+        li {
+          margin-bottom: 8px !important;
+          word-wrap: break-word !important;
+          line-height: 1.4 !important;
+        }
+      }
+    }
+
+    .name-input, 
+    .auth-input {
+      padding: 14px 12px !important;
+      margin: 10px 0 !important;
+      font-size: 16px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      height: auto !important;
+      min-height: 48px !important;
+    }
+
+    .start-button {
+      padding: 14px 32px !important;
+      font-size: 16px !important;
+      margin-top: 16px !important;
+      width: 100% !important;
+      max-width: 280px !important;
+      align-self: center !important;
+      box-sizing: border-box !important;
+    }
+
+    .toggle-mode-btn {
+      margin-top: 12px !important;
+      padding: 12px !important;
+      font-size: 14px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      white-space: normal !important;
+      line-height: 1.4 !important;
+    }
+
+    .error-message {
+      font-size: 13px !important;
+      padding: 12px !important;
+      margin-top: 10px !important;
+      word-wrap: break-word !important;
+    }
+  }
+
+  .score-container {
+    top: 12px !important;
+    right: 12px !important;
+    padding: 10px 16px !important;
+    font-size: 16px !important;
+  }
+
+  .ranking-container {
+    right: 12px !important;
+    top: 65px !important;
+
+    .ranking-toggle {
+      padding: 10px 14px !important;
+      font-size: 14px !important;
+
+      .icon {
+        font-size: 16px !important;
+      }
+    }
+
+    .ranking-content {
+      min-width: 280px !important;
+      max-width: calc(100vw - 24px) !important;
+      padding: 14px !important;
+      max-height: 450px !important;
+    }
+
+    .ranking-title {
+      font-size: 18px !important;
+      margin-bottom: 14px !important;
+    }
+
+    .player-item {
+      padding: 12px !important;
+      gap: 10px !important;
+
+      .rank .medal {
+        font-size: 22px !important;
+      }
+
+      .rank .position {
+        font-size: 15px !important;
+      }
+
+      .player-info .player-name {
+        font-size: 14px !important;
+      }
+
+      .player-info .mysteries-count {
+        font-size: 12px !important;
+      }
+
+      .player-points {
+        font-size: 16px !important;
+      }
+    }
+  }
+
+  .locate-button {
+    top: 15px !important;
+    left: 15px !important;
+    width: 46px !important;
+    height: 46px !important;
+    font-size: 20px !important;
+  }
+
+  .logout-button {
+    bottom: 15px !important;
+    left: 15px !important;
+    padding: 10px 16px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* HONOR MAGIC V5 DESPLEGADO (pantalla interna ~500-540px de ancho útil) */
+@media screen and (min-width: 401px) and (max-width: 600px) and (min-height: 800px) {
+  
+  .welcome-card {
+    padding: 28px 24px !important;
+    max-width: 500px !important;
+    width: 92% !important;
+
+    .mystery-logo {
+      width: 85px !important;
+      margin-bottom: 14px !important;
+    }
+
+    .mystery-title {
+      font-size: 32px !important;
+      margin-bottom: 12px !important;
+      line-height: 1.2 !important;
+    }
+
+    .description-box {
+      font-size: 15px !important;
+      margin: 14px 0 !important;
+      line-height: 1.5 !important;
+
+      p {
+        margin-bottom: 10px !important;
+      }
+      
+      ul {
+        padding-left: 26px !important;
+        
+        li {
+          margin-bottom: 8px !important;
+        }
+      }
+    }
+
+    .name-input,
+    .auth-input {
+      padding: 14px !important;
+      margin: 12px 0 !important;
+      font-size: 16px !important;
+      min-height: 50px !important;
+    }
+
+    .start-button {
+      padding: 14px 36px !important;
+      font-size: 17px !important;
+      margin-top: 18px !important;
+      max-width: 300px !important;
+    }
+
+    .toggle-mode-btn {
+      margin-top: 14px !important;
+      padding: 12px !important;
+      font-size: 15px !important;
+    }
+
+    .error-message {
+      font-size: 14px !important;
+      padding: 12px !important;
+    }
+  }
+
+  .score-container {
+    top: 18px !important;
+    right: 18px !important;
+    padding: 12px 20px !important;
+    font-size: 18px !important;
+  }
+
+  .ranking-container {
+    top: 75px !important;
+    right: 18px !important;
+
+    .ranking-content {
+      min-width: 340px !important;
+      max-width: 420px !important;
+    }
+  }
+
+  .locate-button {
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 22px !important;
+  }
+}
+
+/* Si el teléfono está en horizontal */
+@media screen and (max-height: 500px) {
+  .welcome-card {
+    max-height: 95vh !important;
+    overflow-y: auto !important;
+    padding: 16px 14px !important;
+  }
+}
+
+/* ============================================
+   🔧 FIX HONOR MAGIC & DISPOSITIVOS 360px
+   Alinear Puntos y Ranking - mismo tamaño
+   ============================================ */
+@media (min-width: 360px) and (max-width: 375px) {
+  /* ✅ Puntos - Botón superior */
+  .score-container {
+    top: 15px !important;
+    right: 15px !important;
+    padding: 10px 16px !important;
+    height: 44px !important;
+    font-size: 0.95rem !important;
+    min-width: 140px !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ✅ Ranking - Botón inferior (alineado con Puntos) */
+  .ranking-container {
+    top: 70px !important; /* Justo debajo */
+    right: 15px !important; /* Misma posición derecha */
+
+    .ranking-toggle {
+      padding: 10px 16px !important; /* ✅ MISMO padding */
+      height: 44px !important; /* ✅ MISMA altura */
+      font-size: 0.95rem !important; /* ✅ MISMO tamaño fuente */
+      min-width: 140px !important; /* ✅ MISMO ancho */
+      justify-content: center !important;
+      box-sizing: border-box !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+
+      .icon {
+        font-size: 1.2rem !important;
+        line-height: 1 !important;
+      }
+    }
+
+    .ranking-content {
+      min-width: 280px !important;
+      max-width: 330px !important;
+    }
+  }
+}
+
