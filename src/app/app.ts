@@ -84,10 +84,10 @@ export class App {
   private vibrar(pattern: number | number[]): void {
     // ✅ No vibrar si estamos haciendo logout o en pantallas de bienvenida/instrucciones
     if (this.isLoggingOut || this.showWelcome() || this.showInstructions()) return;
-    
+
     // ✅ No vibrar si no hay usuario logueado
     if (!this.userId) return;
-    
+
     try {
       // Verificar soporte de vibración
       if (!('vibrate' in navigator)) {
@@ -97,7 +97,7 @@ export class App {
 
       const nav = navigator as any;
       const success = nav.vibrate(pattern);
-      
+
       if (success) {
         console.log('✅ Vibración ejecutada:', pattern);
       } else {
@@ -121,11 +121,12 @@ export class App {
 
     // ✅ Registrar Service Worker para notificaciones en segundo plano
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js')
-        .then(registration => {
+      navigator.serviceWorker
+        .register('/service-worker.js')
+        .then((registration) => {
           console.log('✅ Service Worker registrado:', registration.scope);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('❌ Error al registrar Service Worker:', error);
         });
     }
@@ -264,7 +265,7 @@ export class App {
         console.log('✅ Login exitoso:', trimmedName);
         this.showWelcome.set(false);
         this.showInstructions.set(true); // ✅ Mostrar instrucciones
-        
+
         // ✅ Solicitar permisos de notificación
         if ('Notification' in window && Notification.permission === 'default') {
           Notification.requestPermission();
@@ -351,12 +352,24 @@ export class App {
       return;
     }
 
+    // ✅ Función para limpiar acentos, mayúsculas y espacios
+    const normalizar = (texto: string) => {
+      return texto
+        .toLowerCase() // Todo a minúsculas
+        .trim() // Quitar espacios al inicio y final
+        .normalize('NFD') // Descomponer caracteres con acentos
+        .replace(/[\u0300-\u036f]/g, ''); // Eliminar los símbolos de acentos
+    };
+
+    const userClean = normalizar(respuestaUser);
+    const correctClean = normalizar(misterio.respuesta);
+
     console.log('🔍 Validando:');
     console.log('   Usuario escribió:', respuestaUser.toLowerCase());
     console.log('   Respuesta correcta:', misterio.respuesta.toLowerCase());
 
-    if (respuestaUser.toLowerCase() === misterio.respuesta.toLowerCase()) {
-      console.log('✅ ¡Respuesta correcta!');
+    if (userClean === correctClean) {
+      console.log('✅ ¡Respuesta correcta! (Normalizada)');
 
       this.map.closePopup();
       misterio.desbloqueado = true;
@@ -721,7 +734,7 @@ export class App {
   // ✅ NUEVO MÉTODO: Mostrar notificación del sistema tipo SMS/WhatsApp
   private async mostrarNotificacionProximidad(mystery: any, distance: number) {
     console.log('🔔 Intentando enviar notificación para:', mystery.titulo);
-    
+
     // ✅ VIBRACIÓN DIRECTA (funciona incluso con pantalla apagada)
     this.vibrar([200, 100, 200, 100, 200]); // Patrón más largo y notorio
 
@@ -729,13 +742,13 @@ export class App {
     if ('serviceWorker' in navigator && Notification.permission === 'granted') {
       try {
         const registration = await navigator.serviceWorker.ready;
-        
+
         // Enviar mensaje al Service Worker para que muestre la notificación
         registration.active?.postMessage({
           type: 'PROXIMITY_ALERT',
           title: '❓ ¡Misterio Cerca!',
           body: `Estás a ${Math.round(distance)}m de "${mystery.titulo}". ¡Acércate más!`,
-          mystery: { id: mystery.id, titulo: mystery.titulo }
+          mystery: { id: mystery.id, titulo: mystery.titulo },
         });
 
         console.log('✅ Notificación enviada via Service Worker');
@@ -805,7 +818,7 @@ export class App {
 
     this.loadedMysteries.forEach((mysteryId) => {
       const m = this.misteriosList.find((mystery) => mystery.id === mysteryId);
-      
+
       // ✅ SI EL MISTERIO ESTÁ RESUELTO, NO HACER NADA (sin vibración, sin notificación)
       if (!m || m.desbloqueado) return;
 
@@ -825,7 +838,7 @@ export class App {
           this.notifiedMysteries.delete(m.id);
           this.vibratedMysteries.delete(m.id);
         }
-        
+
         marker.bindPopup(`
           <div style="text-align: center; padding: 10px;">
             <b>🔒 Bloqueado</b><br>
@@ -833,19 +846,21 @@ export class App {
             <span style="font-size: 11px; color: #666;">Acércate a ${unlockRadius}m para desbloquear</span>
           </div>`);
       }
-      
+
       // ===== DENTRO DEL RADIO DE FIREBASE ===== ✅ AQUÍ VIBRA Y NOTIFICA
       else if (distance < unlockRadius && isLocationReliable) {
         // ✅ Vibración + Notificación SOLO UNA VEZ al entrar en el radio
         if (!this.vibratedMysteries.has(m.id)) {
-          console.log(`🎯 ¡ENTRASTE EN EL RADIO! ${m.titulo} - Distancia: ${Math.round(distance)}m de ${unlockRadius}m`);
-          
+          console.log(
+            `🎯 ¡ENTRASTE EN EL RADIO! ${m.titulo} - Distancia: ${Math.round(distance)}m de ${unlockRadius}m`,
+          );
+
           // Vibración fuerte
           this.vibrar([300, 100, 300, 100, 300]);
-          
+
           // Notificación
           this.mostrarNotificacionProximidad(m, distance);
-          
+
           // Marcar como ya notificado
           this.vibratedMysteries.add(m.id);
           this.notifiedMysteries.add(m.id);
