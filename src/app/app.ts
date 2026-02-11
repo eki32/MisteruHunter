@@ -732,43 +732,45 @@ export class App {
   }
 
   // ✅ NUEVO MÉTODO: Mostrar notificación del sistema tipo SMS/WhatsApp
-  private async mostrarNotificacionProximidad(mystery: any, distance: number) {
-    console.log('🔔 Intentando enviar notificación para:', mystery.titulo);
+private async mostrarNotificacionProximidad(mystery: any, distance: number) {
+  console.log('🔔 Intentando enviar notificación para:', mystery.titulo);
 
-    // ✅ VIBRACIÓN DIRECTA (funciona incluso con pantalla apagada)
-    this.vibrar([200, 100, 200, 100, 200]); // Patrón más largo y notorio
+  // 1. VIBRACIÓN DIRECTA
+  // Seguirá funcionando en Android. En iOS se ignorará sin dar error.
+  this.vibrar([200, 100, 200, 100, 200]); 
 
-    // ✅ NOTIFICACIÓN VÍA SERVICE WORKER (funciona en segundo plano)
-    if ('serviceWorker' in navigator && Notification.permission === 'granted') {
-      try {
-        const registration = await navigator.serviceWorker.ready;
+  // 2. LÓGICA DE NOTIFICACIÓN COMPATIBLE
+  if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+    try {
+      const registration = await navigator.serviceWorker.ready;
 
-        // Enviar mensaje al Service Worker para que muestre la notificación
-        registration.active?.postMessage({
-          type: 'PROXIMITY_ALERT',
-          title: '❓ ¡Misterio Cerca!',
-          body: `Estás a ${Math.round(distance)}m de "${mystery.titulo}". ¡Acércate más!`,
-          mystery: { id: mystery.id, titulo: mystery.titulo },
-        });
+      // ✅ CAMBIO PARA iOS: Usamos showNotification directamente.
+      // Esto funciona tanto en Android como en iOS (PWA instalada).
+      await registration.showNotification('❓ ¡Misterio Cerca!', {
+        body: `Estás a ${Math.round(distance)}m de "${mystery.titulo}". ¡Acércate más!`,
+        icon: 'public/logoMistery.png', // Tu detective
+        badge: 'assets/locked.png',
+        vibrate: [200, 100, 200],
+        tag: `proximity-${mystery.id}`,
+        renotify: true,
+        data: { mysteryId: mystery.id }
+      } as any);
 
-        console.log('✅ Notificación enviada via Service Worker');
-      } catch (error) {
-        console.error('❌ Error al enviar notificación:', error);
-        // Fallback: notificación normal
-        this.mostrarNotificacionNormal(mystery, distance);
-      }
-    } else if (Notification.permission === 'granted') {
-      // Fallback si no hay Service Worker
+      // Mantenemos tu postMessage si tu service-worker.js hace algo extra con él
+      registration.active?.postMessage({
+        type: 'PROXIMITY_ALERT',
+        mystery: { id: mystery.id, titulo: mystery.titulo },
+      });
+
+      console.log('✅ Notificación enviada vía Service Worker');
+    } catch (error) {
+      console.error('❌ Error:', error);
       this.mostrarNotificacionNormal(mystery, distance);
-    } else {
-      console.warn('⚠️ Permisos de notificación no concedidos:', Notification.permission);
-      // Intentar pedir permisos de nuevo
-      if (Notification.permission === 'default') {
-        const permission = await Notification.requestPermission();
-        console.log('📱 Permiso de notificación:', permission);
-      }
     }
+  } else if (Notification.permission === 'granted') {
+    this.mostrarNotificacionNormal(mystery, distance);
   }
+}
 
   // Notificación normal (fallback)
   private mostrarNotificacionNormal(mystery: any, distance: number) {
