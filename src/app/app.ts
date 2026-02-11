@@ -746,7 +746,7 @@ private async mostrarNotificacionProximidad(mystery: any, distance: number) {
 
       // ✅ CAMBIO PARA iOS: Usamos showNotification directamente.
       // Esto funciona tanto en Android como en iOS (PWA instalada).
-      await registration.showNotification('❓ ¡Misterio Cerca!', {
+      await registration.showNotification(' ¡Misterio Cerca!', {
         body: `Estás a ${Math.round(distance)}m de "${mystery.titulo}". ¡Acércate más!`,
         icon: 'public/logoMistery.png', // Tu detective
         badge: 'assets/locked.png',
