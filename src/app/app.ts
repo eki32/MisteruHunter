@@ -733,8 +733,8 @@ export class App {
         // Enviar mensaje al Service Worker para que muestre la notificación
         registration.active?.postMessage({
           type: 'PROXIMITY_ALERT',
-          title: '📍 ¡Misterio Cerca!',
-          body: `Estás a ${Math.round(distance)}m de "${mystery.titulo}". ¡Acércate más!`,
+          title: '🔍 ¡Misterio Cerca!',
+          body: `Estás a ${Math.round(distance)}m de "${mystery.titulo}". ¡Descúbrelo!`,
           mystery: { id: mystery.id, titulo: mystery.titulo }
         });
 
