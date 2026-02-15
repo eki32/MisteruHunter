@@ -355,7 +355,13 @@ export class App {
     console.log('   Usuario escribió:', respuestaUser.toLowerCase());
     console.log('   Respuesta correcta:', misterio.respuesta.toLowerCase());
 
-    if (respuestaUser.toLowerCase() === misterio.respuesta.toLowerCase()) {
+    // ✅ Normalizar: minúsculas + sin tildes + sin espacios extra
+    const normalizar = (texto: string) =>
+      texto.toLowerCase().trim()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+
+    if (normalizar(respuestaUser) === normalizar(misterio.respuesta)) {
       console.log('✅ ¡Respuesta correcta!');
 
       this.map.closePopup();
@@ -940,5 +946,15 @@ export class App {
     });
   }
 
+  // 🧪 TEST - Simula entrar en el radio de un misterio desde casa
+  testNotificacionProximidad() {
+    const misterioTest = this.misteriosList[0] ?? {
+      id: 'test-123',
+      titulo: 'Misterio de Prueba',
+      radioDesbloqueo: 50
+    };
 
+    console.log('🧪 Test notificación para:', misterioTest.titulo);
+    this.mostrarNotificacionProximidad(misterioTest, 30);
+  }
 }
