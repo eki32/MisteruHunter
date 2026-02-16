@@ -1,0 +1,5 @@
+{
+	"appId": "com.example.app",
+	"appName": "mystery-hunter",
+	"webDir": "dist/mystery-hunter/browser"
+}

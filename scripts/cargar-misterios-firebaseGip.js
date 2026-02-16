@@ -19,10 +19,10 @@ const misterios = [
   respuesta: "Playa de La Concha",
   latitud: 43.3180,
   longitud: -1.9869,
-  radioDesbloqueo: 200,
+  radioDesbloqueo: 300,
   desbloqueado: false,
   descripcion: "La Playa de La Concha es uno de los arenales urbanos más famosos del mundo.",
-  imagen: ""
+  imagen: "https://www.barcelo.com/guia-turismo/wp-content/uploads/2024/09/ok-playa-de-la-concha.jpg"
 },
 {
   titulo: "El Monte de la Ciudad",
@@ -30,10 +30,10 @@ const misterios = [
   respuesta: "Monte Urgull",
   latitud: 43.3240,
   longitud: -1.9860,
-  radioDesbloqueo: 200,
+  radioDesbloqueo: 500,
   desbloqueado: false,
   descripcion: "El Monte Urgull ofrece vistas panorámicas de Donostia y su bahía.",
-  imagen: ""
+  imagen: "https://www.barcelo.com/guia-turismo/wp-content/uploads/2019/10/monte-urgull_1.jpg"
 },
 {
   titulo: "El Mirador del Dragón Verde",
@@ -41,10 +41,10 @@ const misterios = [
   respuesta: "Monte Igueldo",
   latitud: 43.3140,
   longitud: -2.0270,
-  radioDesbloqueo: 200,
+  radioDesbloqueo: 400,
   desbloqueado: false,
   descripcion: "El Monte Igueldo es famoso por su parque de atracciones y sus vistas.",
-  imagen: ""
+  imagen: "https://upload.wikimedia.org/wikipedia/commons/3/3e/Lighthouse_in_San_Sebastian%27s_Igueldo_mountain_%28Donostia%2C_Spain%29..jpg"
 },
 {
   titulo: "La Isla del Medio",
@@ -52,10 +52,10 @@ const misterios = [
   respuesta: "Isla de Santa Clara",
   latitud: 43.3200,
   longitud: -1.9980,
-  radioDesbloqueo: 200,
+  radioDesbloqueo: 1000,
   desbloqueado: false,
   descripcion: "La Isla de Santa Clara es un símbolo de la bahía de Donostia.",
-  imagen: ""
+  imagen: "https://upload.wikimedia.org/wikipedia/commons/8/85/San_Sebastian_from_Igeldo.jpg"
 },
 {
   titulo: "El Santuario del Monte",
@@ -66,7 +66,7 @@ const misterios = [
   radioDesbloqueo: 300,
   desbloqueado: false,
   descripcion: "El Santuario de Urkiola es un lugar de peregrinación en la frontera entre Bizkaia y Gipuzkoa.",
-  imagen: ""
+  imagen: "https://upload.wikimedia.org/wikipedia/commons/8/8a/Urkiola_-_Santuario_29.jpg"
 },
 {
   titulo: "El Bosque de los Gigantes",
@@ -74,10 +74,10 @@ const misterios = [
   respuesta: "Bosque de Artikutza",
   latitud: 43.2330,
   longitud: -1.7500,
-  radioDesbloqueo: 300,
+  radioDesbloqueo: 600,
   desbloqueado: false,
   descripcion: "Artikutza es un bosque húmedo protegido, propiedad del Ayuntamiento de Donostia.",
-  imagen: ""
+  imagen: "https://www.turismodeobservacion.com/media/fotografias/bosque-de-artikutza-31815-xl.jpg"
 },
 {
   titulo: "El Mirador del Flysch",
@@ -88,7 +88,7 @@ const misterios = [
   radioDesbloqueo: 250,
   desbloqueado: false,
   descripcion: "El Flysch de Zumaia es uno de los paisajes geológicos más importantes del mundo.",
-  imagen: ""
+  imagen: "https://www.barcelo.com/guia-turismo/wp-content/uploads/2024/09/ok-geoparque-flysch.jpg"
 },
 {
   titulo: "La Ermita del Acantilado",
@@ -99,7 +99,7 @@ const misterios = [
   radioDesbloqueo: 150,
   desbloqueado: false,
   descripcion: "La ermita de San Telmo es famosa por su ubicación sobre el flysch.",
-  imagen: ""
+  imagen: "https://turismovasco.com/wp-content/uploads/et_temp/visitas-al-flysch-de-zumaia-ermita-de-san-telmo-202648_1024x675.jpg"
 },
 {
   titulo: "El Puente del Río Urola",
@@ -110,7 +110,7 @@ const misterios = [
   radioDesbloqueo: 120,
   desbloqueado: false,
   descripcion: "El puente de Zubimusu es uno de los símbolos de Azpeitia.",
-  imagen: ""
+  imagen: "https://estaticosgn-cdn.deia.eus/clip/5150711f-9f1d-43d1-ab63-a985e796c547_16-9-aspect-ratio_default_0.jpg"
 },
 {
   titulo: "El Santuario del Hierro",
@@ -121,7 +121,7 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "El Santuario de Loyola es el lugar de nacimiento de San Ignacio.",
-  imagen: ""
+  imagen: "https://turismo.euskadi.eus/contenidos/h_cultura_y_patrimonio/0000011147_h5_rec_turismo/es_11147/images/GL_SanIgnacioLoiola.jpg"
 },
 {
   titulo: "El Tren del Valle",
@@ -132,7 +132,7 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "El tren del Museo Vasco del Ferrocarril recorre el valle del Urola.",
-  imagen: ""
+  imagen: "https://turismo.euskadi.eus/contenidos/evento/0000066341_m1_rec_turismo/es_66341/images/FP_Museovascodelferrocarrilazpeitia.jpg"
 },
 {
   titulo: "El Mirador del Oria",
@@ -140,10 +140,10 @@ const misterios = [
   respuesta: "Monte Andatza",
   latitud: 43.2400,
   longitud: -2.0900,
-  radioDesbloqueo: 250,
+  radioDesbloqueo: 850,
   desbloqueado: false,
   descripcion: "El monte Andatza es uno de los mejores miradores del valle del Oria.",
-  imagen: ""
+  imagen: "https://fotolector.diariovasco.com/fotos/2024/2024/08/llegando-cima-boscosa-monte-andatza-202408062349-978x699.jpg"
 },
 {
   titulo: "La Playa de las Rocas Negras",
@@ -154,7 +154,7 @@ const misterios = [
   radioDesbloqueo: 150,
   desbloqueado: false,
   descripcion: "Itzurun es famosa por su flysch y por aparecer en series internacionales.",
-  imagen: ""
+  imagen: "https://www.turismodeobservacion.com/media/fotografias/playa-de-itzurun-zumaya-gipuzkoa-91279-xl.jpg"
 },
 {
   titulo: "El Mirador del Valle del Deba",
@@ -165,7 +165,7 @@ const misterios = [
   radioDesbloqueo: 300,
   desbloqueado: false,
   descripcion: "Karakate es uno de los montes más emblemáticos entre Eibar y Elgoibar.",
-  imagen: ""
+  imagen: "https://s3.ppllstatics.com/diariovasco/www/pre2017/multimedia/noticias/201705/04/media/24004344.JPG"
 }
 
 ,
@@ -178,7 +178,7 @@ const misterios = [
   radioDesbloqueo: 250,
   desbloqueado: false,
   descripcion: "Arantzazu es uno de los santuarios más importantes de Euskadi, situado en un entorno natural espectacular.",
-  imagen: ""
+  imagen: "https://oñatiturismo.eus/wp-content/uploads/2016/10/arantzazuko-santutegia-3.jpg"
 },
 {
   titulo: "El Mirador del Aitzkorri",
@@ -186,10 +186,10 @@ const misterios = [
   respuesta: "Aizkorri (zona de Urbia)",
   latitud: 42.9880,
   longitud: -2.3140,
-  radioDesbloqueo: 350,
+  radioDesbloqueo: 850,
   desbloqueado: false,
   descripcion: "La zona de Urbia ofrece vistas únicas del macizo del Aizkorri.",
-  imagen: ""
+  imagen: "https://upload.wikimedia.org/wikipedia/commons/e/ee/Urbia_%28Gipuzkoa%29.jpg"
 },
 {
   titulo: "El Bosque de los Secretos",
@@ -200,7 +200,7 @@ const misterios = [
   radioDesbloqueo: 300,
   desbloqueado: false,
   descripcion: "El hayedo de Otzarreta es famoso por sus árboles de formas retorcidas.",
-  imagen: ""
+  imagen: "https://turismovasco.com/wp-content/uploads/2017/11/Musgo-en-las-raices-de-los-%C3%A1rboles-de-Otzarreta-1024x768.jpg"
 },
 {
   titulo: "El Mirador del Urola",
@@ -208,10 +208,10 @@ const misterios = [
   respuesta: "Izarraitz",
   latitud: 43.2000,
   longitud: -2.3000,
-  radioDesbloqueo: 300,
+  radioDesbloqueo: 900,
   desbloqueado: false,
   descripcion: "El macizo de Izarraitz domina Azkoitia, Azpeitia y Zestoa.",
-  imagen: ""
+  imagen: "https://satorrak.com/web/images/stories/satorrak/diario/izarraitz-2.jpg"
 },
 {
   titulo: "La Cueva del Tiempo",
@@ -222,7 +222,7 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "Ekain es una cueva con arte rupestre declarada Patrimonio de la Humanidad.",
-  imagen: ""
+  imagen: "https://www.ekainberri.eus/wp-content/uploads/2017/03/interior2.jpg"
 },
 {
   titulo: "El Balcón del Cantábrico",
@@ -233,7 +233,7 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "Talaimendi es un mirador natural sobre Zarautz y Getaria.",
-  imagen: ""
+  imagen: "https://s0.wklcdn.com/image_67/2010687/82500980/53376861Master.jpg"
 },
 {
   titulo: "El Faro del Ratón",
@@ -244,7 +244,7 @@ const misterios = [
   radioDesbloqueo: 150,
   desbloqueado: false,
   descripcion: "El faro de Getaria se sitúa sobre el monte San Antón, conocido como 'El Ratón'.",
-  imagen: ""
+  imagen: "https://santacruzmipuerto.com/images4/Noticias1/farosguipuzcoagetaria/1.jpg"
 },
 {
   titulo: "El Mirador del Ratón",
@@ -252,10 +252,10 @@ const misterios = [
   respuesta: "Monte San Antón (El Ratón de Getaria)",
   latitud: 43.3055,
   longitud: -2.2050,
-  radioDesbloqueo: 200,
+  radioDesbloqueo: 1000,
   desbloqueado: false,
   descripcion: "El Ratón de Getaria es uno de los perfiles más reconocibles de la costa vasca.",
-  imagen: ""
+  imagen: "https://hirukide.com/wp-content/uploads/2023/12/ocio14.jpg"
 },
 {
   titulo: "La Playa de los Surfistas",
@@ -263,22 +263,12 @@ const misterios = [
   respuesta: "Playa de Zarautz",
   latitud: 43.2840,
   longitud: -2.1690,
-  radioDesbloqueo: 200,
+  radioDesbloqueo: 500,
   desbloqueado: false,
   descripcion: "Zarautz es una de las playas más largas del Cantábrico y un referente del surf.",
-  imagen: ""
+  imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Zarautz%2C_Gipuzkoa%2C_Euskal_Herria.jpg/1280px-Zarautz%2C_Gipuzkoa%2C_Euskal_Herria.jpg"
 },
-{
-  titulo: "El Mirador del Puerto",
-  acertijo: "Un monte pequeño pero con vistas perfectas a un puerto pesquero. ¿Qué monte soy?",
-  respuesta: "Monte San Blas (Mutriku)",
-  latitud: 43.3070,
-  longitud: -2.3850,
-  radioDesbloqueo: 150,
-  desbloqueado: false,
-  descripcion: "San Blas es un mirador natural sobre Mutriku y su costa.",
-  imagen: ""
-},
+
 {
   titulo: "El Faro de los Acantilados",
   acertijo: "Un faro blanco se alza sobre acantilados oscuros. ¿Qué faro soy?",
@@ -288,41 +278,21 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "El faro de Santa Catalina ofrece vistas espectaculares del Cantábrico.",
-  imagen: ""
+  imagen: "https://www.noradoa.com/wordpress/wp-content/uploads/2020/04/faro-santa-catalina-noradoa-1.jpg"
 },
-{
-  titulo: "El Mirador del Deba",
-  acertijo: "Un monte con vistas al mar y al valle del Deba. ¿Qué monte soy?",
-  respuesta: "Kukuarri",
-  latitud: 43.2900,
-  longitud: -2.0500,
-  radioDesbloqueo: 250,
-  desbloqueado: false,
-  descripcion: "Kukuarri es un monte costero entre Orio y Usurbil.",
-  imagen: ""
-},
+
 {
   titulo: "El Bosque del Dragón",
   acertijo: "Un bosque húmedo y profundo donde la niebla crea figuras. ¿Qué bosque soy?",
   respuesta: "Bosque de Pagoeta",
   latitud: 43.2400,
   longitud: -2.1500,
-  radioDesbloqueo: 300,
+  radioDesbloqueo: 600,
   desbloqueado: false,
   descripcion: "El Parque Natural de Pagoeta es un espacio protegido lleno de senderos y hayedos.",
-  imagen: ""
+  imagen: "https://www.nekatur.net/datos/espacios_naturales_fotos/foto10/pagoeta1.jpg"
 },
-{
-  titulo: "El Mirador del Goierri",
-  acertijo: "Un monte desde el que se ve todo el corazón verde de Gipuzkoa. ¿Qué monte soy?",
-  respuesta: "Txindoki",
-  latitud: 43.0330,
-  longitud: -2.0830,
-  radioDesbloqueo: 350,
-  desbloqueado: false,
-  descripcion: "El Txindoki es uno de los montes más emblemáticos de Gipuzkoa, conocido como el Cervino vasco.",
-  imagen: ""
-},
+
 {
   titulo: "El Santuario del Pastor",
   acertijo: "Un pequeño templo en un alto, rodeado de pastos y montañas. ¿Qué ermita soy?",
@@ -332,30 +302,19 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "Larraitz es punto de partida para ascender al Txindoki.",
-  imagen: ""
+  imagen: "https://www.kulturweb.com/adm/imagenes/gipuzkoan/abal-larraitzbaseliza01.jpg"
 }
 ,
-{
-  titulo: "El Mirador del Cantábrico Azul",
-  acertijo: "Un monte costero se asoma al mar entre prados verdes y acantilados. ¿Qué monte soy?",
-  respuesta: "Monte Mendizorrotz",
-  latitud: 43.2850,
-  longitud: -2.0900,
-  radioDesbloqueo: 250,
-  desbloqueado: false,
-  descripcion: "Mendizorrotz es un monte costero entre Orio y Donostia con vistas espectaculares.",
-  imagen: ""
-},
 {
   titulo: "El Faro de los Marineros",
   acertijo: "Un faro blanco vigila la entrada a un puerto pesquero famoso por su txakoli. ¿Qué faro soy?",
   respuesta: "Faro de Getaria",
   latitud: 43.3050,
   longitud: -2.2040,
-  radioDesbloqueo: 150,
+  radioDesbloqueo: 350,
   desbloqueado: false,
   descripcion: "El faro de Getaria se sitúa sobre el monte San Antón, conocido como El Ratón.",
-  imagen: ""
+  imagen: "https://santacruzmipuerto.com/images4/Noticias1/farosguipuzcoagetaria/1.jpg"
 },
 {
   titulo: "El Mirador del Puerto Viejo",
@@ -366,7 +325,7 @@ const misterios = [
   radioDesbloqueo: 150,
   desbloqueado: false,
   descripcion: "El Puerto Viejo de Hondarribia es uno de los barrios marineros más bonitos de Euskadi.",
-  imagen: ""
+  imagen: "https://turismo.euskadi.eus/contenidos/h_cultura_y_patrimonio/0000008812_h6_rec_turismo/es_8812/images/FP_Hondarribia_puerto.jpg"
 },
 {
   titulo: "La Fortaleza del Bidasoa",
@@ -377,7 +336,7 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "El Castillo de San Telmo es una fortaleza defensiva en la desembocadura del Bidasoa.",
-  imagen: ""
+  imagen: "https://www.castillosnet.org/datos/guipuzcoa/hondarribia/hondarribia/castillo_de_san_telmo/SS-CAS-003-0010001.jpg"
 },
 {
   titulo: "El Mirador de los Pirineos",
@@ -385,10 +344,10 @@ const misterios = [
   respuesta: "Monte Jaizkibel",
   latitud: 43.3580,
   longitud: -1.8500,
-  radioDesbloqueo: 300,
+  radioDesbloqueo: 600,
   desbloqueado: false,
   descripcion: "Jaizkibel es uno de los montes más emblemáticos de la costa vasca.",
-  imagen: ""
+  imagen: "https://thumbs.dreamstime.com/b/monte-jaizkibel-en-guipuzcoa-espa%C3%B1a-29681796.jpg"
 },
 {
   titulo: "La Playa de las Dunas",
@@ -396,10 +355,10 @@ const misterios = [
   respuesta: "Playa de Hondarribia",
   latitud: 43.3710,
   longitud: -1.7900,
-  radioDesbloqueo: 200,
+  radioDesbloqueo: 600,
   desbloqueado: false,
   descripcion: "La playa de Hondarribia es un arenal amplio junto a la desembocadura del Bidasoa.",
-  imagen: ""
+  imagen: "https://www.guide-du-paysbasque.com/_bibli/annonces/6806/hd/playa-hondarribia.jpg"
 },
 {
   titulo: "El Bosque del Dragón Blanco",
@@ -412,39 +371,7 @@ const misterios = [
   descripcion: "El valle del Leitzaran es un espacio natural protegido lleno de senderos y túneles ferroviarios antiguos.",
   imagen: ""
 },
-{
-  titulo: "El Mirador del Valle del Oria",
-  acertijo: "Un monte con vistas a un valle industrial y verde. ¿Qué monte soy?",
-  respuesta: "Monte Buruntza",
-  latitud: 43.2400,
-  longitud: -2.0500,
-  radioDesbloqueo: 250,
-  desbloqueado: false,
-  descripcion: "Buruntza es un monte emblemático entre Andoain y Lasarte-Oria.",
-  imagen: ""
-},
-{
-  titulo: "El Santuario del Pastor Blanco",
-  acertijo: "Un pequeño templo blanco se alza en un collado entre montes. ¿Qué ermita soy?",
-  respuesta: "Ermita de Erniozabal",
-  latitud: 43.2000,
-  longitud: -2.1500,
-  radioDesbloqueo: 200,
-  desbloqueado: false,
-  descripcion: "Erniozabal es una ermita situada en las laderas del monte Ernio.",
-  imagen: ""
-},
-{
-  titulo: "El Mirador del Ernio",
-  acertijo: "Un monte sagrado para los guipuzcoanos, coronado por cruces. ¿Qué monte soy?",
-  respuesta: "Monte Ernio",
-  latitud: 43.2000,
-  longitud: -2.1500,
-  radioDesbloqueo: 350,
-  desbloqueado: false,
-  descripcion: "El Ernio es uno de los montes más populares para el senderismo en Gipuzkoa.",
-  imagen: ""
-},
+
 {
   titulo: "El Puente del Urola",
   acertijo: "Un puente histórico une dos orillas en una villa famosa por su tren. ¿Qué puente soy?",
@@ -454,41 +381,21 @@ const misterios = [
   radioDesbloqueo: 150,
   desbloqueado: false,
   descripcion: "El puente de Iraeta es uno de los símbolos de Zestoa.",
-  imagen: ""
+  imagen: "https://s0.wklcdn.com/image_210/6300530/155722907/97837227.400x300.jpg"
 },
-{
-  titulo: "El Mirador del Cantábrico Oriental",
-  acertijo: "Un monte costero con vistas a Francia y al mar. ¿Qué monte soy?",
-  respuesta: "Monte Guadalupe",
-  latitud: 43.3680,
-  longitud: -1.7900,
-  radioDesbloqueo: 250,
-  desbloqueado: false,
-  descripcion: "Guadalupe es un monte con una ermita y vistas espectaculares sobre Hondarribia.",
-  imagen: ""
-},
+
 {
   titulo: "La Playa del Ratón",
   acertijo: "Una playa protegida por un monte con forma de animal. ¿Qué playa soy?",
   respuesta: "Playa de Malkorbe (Getaria)",
   latitud: 43.3040,
   longitud: -2.2050,
-  radioDesbloqueo: 150,
+  radioDesbloqueo: 350,
   desbloqueado: false,
   descripcion: "Malkorbe es una playa tranquila protegida por el monte San Antón.",
-  imagen: ""
+  imagen: "https://turismo.euskadi.eus/contenidos/g_naturaleza/0000003002_g1_rec_turismo/es_3002/images/FP_malkorbe_ok.jpg"
 },
-{
-  titulo: "El Mirador del Valle de Oñati",
-  acertijo: "Un monte con vistas a un valle lleno de historia y monasterios. ¿Qué monte soy?",
-  respuesta: "Monte Aloña",
-  latitud: 43.0400,
-  longitud: -2.4000,
-  radioDesbloqueo: 300,
-  desbloqueado: false,
-  descripcion: "Aloña es un monte emblemático que domina Oñati y Arantzazu.",
-  imagen: ""
-},
+
 {
   titulo: "El Santuario del Valle Oculto",
   acertijo: "Un monasterio escondido entre montañas, famoso por su claustro. ¿Qué monasterio soy?",
@@ -498,20 +405,10 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "El Monasterio de Bidaurreta es un edificio renacentista situado en Oñati.",
-  imagen: ""
+  imagen: "https://oñatiturismo.eus/wp-content/uploads/2016/10/bidaurreta.jpg"
 }
 ,
-{
-  titulo: "El Mirador del Bidasoa",
-  acertijo: "Un monte fronterizo desde el que se ve Francia, el mar y la desembocadura del río. ¿Qué monte soy?",
-  respuesta: "Monte Larun (Larrun)",
-  latitud: 43.3070,
-  longitud: -1.6280,
-  radioDesbloqueo: 350,
-  desbloqueado: false,
-  descripcion: "Larrun es un monte emblemático en la frontera entre Gipuzkoa y Lapurdi, famoso por su tren cremallera.",
-  imagen: ""
-},
+
 {
   titulo: "El Valle de los Túneles",
   acertijo: "Un antiguo trazado ferroviario convertido en vía verde atraviesa túneles y bosques. ¿Qué valle soy?",
@@ -521,19 +418,9 @@ const misterios = [
   radioDesbloqueo: 300,
   desbloqueado: false,
   descripcion: "La Vía Verde del Plazaola recorre antiguos túneles ferroviarios entre Gipuzkoa y Navarra.",
-  imagen: ""
+  imagen: "https://donosticity.org/wp-content/uploads/2025/05/q4-1-1024x577.jpg"
 },
-{
-  titulo: "El Mirador del Goierri",
-  acertijo: "Un monte con vistas a caseríos, prados y montañas del interior. ¿Qué monte soy?",
-  respuesta: "Monte Orkatzategi",
-  latitud: 43.0400,
-  longitud: -2.3300,
-  radioDesbloqueo: 300,
-  desbloqueado: false,
-  descripcion: "Orkatzategi es un monte rocoso que domina el embalse de Urkulu y el valle de Oñati.",
-  imagen: ""
-},
+
 {
   titulo: "El Embalse Escondido",
   acertijo: "Un lago artificial rodeado de montes y senderos, perfecto para caminar. ¿Qué embalse soy?",
@@ -543,19 +430,8 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "El embalse de Urkulu es un espacio natural muy visitado en el interior de Gipuzkoa.",
-  imagen: ""
+  imagen: "https://www.lonifasiko.com/wp-content/uploads/2014/10/Urkulu_Slider.jpg"
 },
-{
-  titulo: "El Mirador del Cantábrico Interior",
-  acertijo: "Un monte con antenas en su cima y vistas a toda la comarca del Urola. ¿Qué monte soy?",
-  respuesta: "Monte Izazpi",
-  latitud: 43.1000,
-  longitud: -2.2500,
-  radioDesbloqueo: 300,
-  desbloqueado: false,
-  descripcion: "Izazpi es un monte emblemático entre Zumarraga y Azpeitia, con vistas amplias del interior guipuzcoano.",
-  imagen: ""
-}
 
 
 ];

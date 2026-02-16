@@ -23,7 +23,7 @@ const misterios = [
   radioDesbloqueo: 300,
   desbloqueado: false,
   descripcion: "El Serantes es uno de los mejores miradores naturales del Gran Bilbao.",
-  imagen: ""
+  imagen: "https://farm1.staticflickr.com/597/21806294612_8b160a94e2_c.jpg"
 },
 {
   titulo: "La Playa del Faro",
@@ -31,10 +31,10 @@ const misterios = [
   respuesta: "Playa de Ereaga",
   latitud: 43.3410,
   longitud: -3.0120,
-  radioDesbloqueo: 150,
+  radioDesbloqueo: 350,
   desbloqueado: false,
   descripcion: "Ereaga es una de las playas más emblemáticas de Getxo.",
-  imagen: ""
+  imagen: "https://turismovasco.com/wp-content/uploads/2018/03/Getxo.jpg"
 },
 {
   titulo: "El Castillo del Puerto",
@@ -45,7 +45,7 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "El Castillo de la Galea es una antigua batería defensiva en los acantilados de Getxo.",
-  imagen: ""
+  imagen: "https://ilutravel.com/wp-content/uploads/2017/05/Castillo-del-Pr%C3%ADncipe-o-Fuerte-Galea-superior.jpg"
 },
 {
   titulo: "El Mirador del Acantilado",
@@ -53,10 +53,10 @@ const misterios = [
   respuesta: "Acantilados de La Galea",
   latitud: 43.3800,
   longitud: -3.0400,
-  radioDesbloqueo: 250,
+  radioDesbloqueo: 450,
   desbloqueado: false,
   descripcion: "Los acantilados de La Galea son uno de los paisajes costeros más impresionantes de Bizkaia.",
-  imagen: ""
+  imagen: "https://yendoporlavida.com/wp-content/uploads/2024/06/Ruta-de-Sopela-a-Getxo-por-el-Flysch-de-Bizkaia.jpg"
 },
 {
   titulo: "La Playa Salvaje",
@@ -64,10 +64,10 @@ const misterios = [
   respuesta: "Playa de Barinatxe (La Salvaje)",
   latitud: 43.3790,
   longitud: -2.9860,
-  radioDesbloqueo: 200,
+  radioDesbloqueo: 400,
   desbloqueado: false,
   descripcion: "Barinatxe es una playa natural entre Sopela y Getxo, muy popular entre surfistas.",
-  imagen: ""
+  imagen: "https://turismo.euskadi.eus/contenidos/g_naturaleza/0000003019_g1_rec_turismo/es_3019/images/FP_playasG_barinatxe1.jpg"
 },
 {
   titulo: "El Mirador del Flysch Vasco",
@@ -75,32 +75,22 @@ const misterios = [
   respuesta: "Flysch de Barrika",
   latitud: 43.4000,
   longitud: -2.9500,
-  radioDesbloqueo: 250,
+  radioDesbloqueo: 450,
   desbloqueado: false,
   descripcion: "El flysch de Barrika es uno de los paisajes geológicos más llamativos de la costa vasca.",
-  imagen: ""
+  imagen: "https://yendoporlavida.com/wp-content/uploads/2023/04/Playa-de-Muriola-en-el-Flysch-de-Barrika.jpg"
 },
-{
-  titulo: "La Ermita del Acantilado",
-  acertijo: "Una pequeña ermita blanca se asoma al mar desde un acantilado. ¿Qué ermita soy?",
-  respuesta: "Ermita de San Telmo (Plentzia)",
-  latitud: 43.4060,
-  longitud: -2.9500,
-  radioDesbloqueo: 150,
-  desbloqueado: false,
-  descripcion: "La ermita de San Telmo es un pequeño templo costero con vistas al Cantábrico.",
-  imagen: ""
-},
+
 {
   titulo: "La Playa del Puerto",
   acertijo: "Una playa tranquila se esconde junto a un puerto pesquero histórico. ¿Qué playa soy?",
   respuesta: "Playa de Plentzia",
   latitud: 43.4050,
   longitud: -2.9500,
-  radioDesbloqueo: 150,
+  radioDesbloqueo: 500,
   desbloqueado: false,
   descripcion: "La playa de Plentzia es un arenal protegido en la desembocadura de la ría.",
-  imagen: ""
+  imagen: "https://upload.wikimedia.org/wikipedia/commons/0/00/Playa_de_Plentzia.jpg"
 },
 
 {
@@ -109,10 +99,10 @@ const misterios = [
   respuesta: "Monte Pagasarri",
   latitud: 43.2400,
   longitud: -2.9200,
-  radioDesbloqueo: 300,
+  radioDesbloqueo: 500,
   desbloqueado: false,
   descripcion: "El Pagasarri es uno de los montes más populares para hacer senderismo desde Bilbao.",
-  imagen: ""
+  imagen: "https://upload.wikimedia.org/wikipedia/commons/b/b5/Pagasarri-tontorra-gurutzea-cumbre-cruz.jpg"
 },
 {
   titulo: "El Mirador del Nervión",
@@ -123,18 +113,7 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "Artxanda es uno de los mejores miradores de Bilbao, accesible por funicular.",
-  imagen: ""
-},
-{
-  titulo: "El Mirador del Dragón Verde",
-  acertijo: "Un monte costero cubierto de prados cae en vertical hacia el mar. ¿Qué monte soy?",
-  respuesta: "Monte Jata",
-  latitud: 43.4000,
-  longitud: -2.8500,
-  radioDesbloqueo: 300,
-  desbloqueado: false,
-  descripcion: "Jata es uno de los montes más emblemáticos de la costa vizcaína, con vistas al Cantábrico.",
-  imagen: ""
+  imagen: "https://www.bilbaovisitavirtual.eus/wp-content/uploads/2020/02/funicular-artxanda-bilbao-3.jpg"
 },
 {
   titulo: "La Playa del Castillo",
@@ -145,7 +124,7 @@ const misterios = [
   radioDesbloqueo: 150,
   desbloqueado: false,
   descripcion: "La playa de Gorliz es una de las más amplias y familiares de Bizkaia.",
-  imagen: ""
+  imagen: "https://turismo.euskadi.eus/contenidos/g_naturaleza/0000002998_g1_rec_turismo/es_2998/images/FP_golizplaya.jpg"
 },
 {
   titulo: "El Faro del Cantábrico",
@@ -156,7 +135,7 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "El faro de Gorliz es uno de los más altos de la costa vasca.",
-  imagen: ""
+  imagen: "https://thumbs.dreamstime.com/b/faro-gorliz-cabo-villano-golfo-de-biscay-espa%C3%B1a-punto-referencia-en-espa%C3%B1ol-281502991.jpg"
 },
 {
   titulo: "El Mirador del Urdaibai",
@@ -167,7 +146,7 @@ const misterios = [
   radioDesbloqueo: 300,
   desbloqueado: false,
   descripcion: "Atxarre es uno de los mejores miradores de la Reserva de Urdaibai.",
-  imagen: ""
+  imagen: "https://www.urdailife.com/wp-content/uploads/2018/10/Puente-Urdaibai-Familia-Vistas-San-Pedro-Atxarre.jpg"
 },
 {
   titulo: "La Playa del Dragón",
@@ -178,7 +157,7 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "Laga es una de las playas más espectaculares de Bizkaia, junto al cabo Ogoño.",
-  imagen: ""
+  imagen: "https://www.hola.com/horizon/landscape/5215c31f7a56-alm-2g9b9ky-t.jpg"
 },
 {
   titulo: "El Mirador del Acantilado Negro",
@@ -189,7 +168,7 @@ const misterios = [
   radioDesbloqueo: 250,
   desbloqueado: false,
   descripcion: "Ogoño es un impresionante acantilado que domina la playa de Laga.",
-  imagen: ""
+  imagen: "https://www.barcelo.com/guia-turismo/wp-content/uploads/2021/01/ogono.jpg"
 },
 
 {
@@ -201,7 +180,7 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "Aketxe es un islote protegido frente a la costa de Bermeo.",
-  imagen: ""
+  imagen: "https://www.eusko-ikaskuntza.eus/Imgs3digitala/12447.jpg"
 },
 {
   titulo: "El Puerto del Norte",
@@ -212,7 +191,7 @@ const misterios = [
   radioDesbloqueo: 150,
   desbloqueado: false,
   descripcion: "Bermeo es uno de los puertos pesqueros más importantes de Bizkaia.",
-  imagen: ""
+  imagen: "https://upload.wikimedia.org/wikipedia/commons/4/47/Bermeo%27s_old_port.JPG"
 },
 {
   titulo: "El Mirador del Faro Rojo",
@@ -220,10 +199,10 @@ const misterios = [
   respuesta: "Faro de Matxitxako",
   latitud: 43.4470,
   longitud: -2.7660,
-  radioDesbloqueo: 200,
+  radioDesbloqueo: 300,
   desbloqueado: false,
   descripcion: "Matxitxako es uno de los cabos más emblemáticos de la costa vasca.",
-  imagen: ""
+  imagen: "https://media.traveler.es/photos/65001fd4c09a56d57e063db2/master/w_1600%2Cc_limit/3%2520faro.jpg"
 },
 {
   titulo: "La Playa del Flysch",
@@ -231,21 +210,10 @@ const misterios = [
   respuesta: "Playa de Bakio (zona este)",
   latitud: 43.4300,
   longitud: -2.8100,
-  radioDesbloqueo: 150,
+  radioDesbloqueo: 350,
   desbloqueado: false,
   descripcion: "Bakio es una playa amplia con zonas de flysch en sus extremos.",
-  imagen: ""
-},
-{
-  titulo: "El Mirador del Valle del Duranguesado",
-  acertijo: "Un monte rocoso domina un valle industrial y verde. ¿Qué monte soy?",
-  respuesta: "Monte Mugarra",
-  latitud: 43.1500,
-  longitud: -2.6500,
-  radioDesbloqueo: 300,
-  desbloqueado: false,
-  descripcion: "Mugarra es una de las cumbres más características del Duranguesado.",
-  imagen: ""
+  imagen: "https://turismo.euskadi.eus/contenidos/g_naturaleza/0000003003_g1_rec_turismo/es_3003/images/FP_Playa_Bakio.jpg"
 },
 
 {
@@ -257,19 +225,7 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "Baltzola es una cueva famosa por su tamaño y por su importancia arqueológica.",
-  imagen: ""
-},
-
-{
-  titulo: "El Guardián del Duranguesado",
-  acertijo: "Una cumbre afilada domina un valle industrial y verde. ¿Qué monte soy?",
-  respuesta: "Monte Untzillatx",
-  latitud: 43.1500,
-  longitud: -2.7000,
-  radioDesbloqueo: 300,
-  desbloqueado: false,
-  descripcion: "Untzillatx es una de las cumbres más características del macizo del Duranguesado.",
-  imagen: ""
+  imagen: "https://turismovasco.com/wp-content/uploads/2017/01/Cueva-de-Baltzola-desde-el-interior.jpg"
 },
 
 {
@@ -281,21 +237,9 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "Supelegor es una cueva legendaria en el macizo de Aramotz.",
-  imagen: ""
+  imagen: "https://s0.wklcdn.com/image_76/2295025/123390752/79000920.400x300.jpg"
 },
 
-
-{
-  titulo: "El Mirador del Valle de Arratia",
-  acertijo: "Un monte boscoso ofrece vistas a un valle lleno de vida. ¿Qué monte soy?",
-  respuesta: "Monte Upo",
-  latitud: 43.2000,
-  longitud: -2.7800,
-  radioDesbloqueo: 250,
-  desbloqueado: false,
-  descripcion: "Upo es un monte accesible con vistas al valle de Arratia.",
-  imagen: ""
-},
 {
   titulo: "La Ermita del Cazador",
   acertijo: "Una pequeña ermita se alza en un collado entre montes, rodeada de bosques. ¿Qué ermita soy?",
@@ -305,7 +249,7 @@ const misterios = [
   radioDesbloqueo: 150,
   desbloqueado: false,
   descripcion: "San Justo es una ermita situada en un entorno natural privilegiado.",
-  imagen: ""
+  imagen: "https://catalogomonumentaldiocesisbilbao.com/wp-content/uploads/1-Justo-Pastor-Zeberio-1.jpg"
 },
 {
   titulo: "El Mirador del Nervión Verde",
@@ -316,7 +260,7 @@ const misterios = [
   radioDesbloqueo: 300,
   desbloqueado: false,
   descripcion: "Ganekogorta es una de las cumbres más visibles desde Bilbao.",
-  imagen: ""
+  imagen: "https://s0.wklcdn.com/image_213/6411651/76113638/49717065.400x300.jpg"
 },
 {
   titulo: "El Bosque del Dragón Oscuro",
@@ -324,10 +268,10 @@ const misterios = [
   respuesta: "Hayedo de Belaustegi",
   latitud: 43.1000,
   longitud: -2.7500,
-  radioDesbloqueo: 300,
+  radioDesbloqueo: 500,
   desbloqueado: false,
   descripcion: "Belaustegi es uno de los hayedos más bellos del entorno del Gorbea.",
-  imagen: ""
+  imagen: "https://offloadmedia.feverup.com/bilbaosecreto.com/wp-content/uploads/2021/05/01043840/belaustegi-hayedo-1024x683.jpg"
 },
 
 {
@@ -336,10 +280,10 @@ const misterios = [
   respuesta: "Cueva de Pozalagua",
   latitud: 43.2600,
   longitud: -3.3000,
-  radioDesbloqueo: 200,
+  radioDesbloqueo: 400,
   desbloqueado: false,
   descripcion: "Pozalagua es famosa por sus estalactitas excéntricas únicas en el mundo.",
-  imagen: ""
+  imagen: "https://www.cuevasturisticas.es/imagenes-ap/cuevas//zoom/cuevadepozalagua.jpg"
 },
 
 {
@@ -348,10 +292,10 @@ const misterios = [
   respuesta: "Monte La Arboleda (Peñas Negras)",
   latitud: 43.3000,
   longitud: -3.0700,
-  radioDesbloqueo: 250,
+  radioDesbloqueo: 450,
   desbloqueado: false,
   descripcion: "La Arboleda es una zona minera histórica con lagos artificiales y vistas amplias.",
-  imagen: ""
+  imagen: "https://www.trapagaran.net/es-ES/Turismo/Que-ver/PublishingImages/arboleda3.jpg"
 },
 {
   titulo: "La Mina del Tiempo",
@@ -362,14 +306,8 @@ const misterios = [
   radioDesbloqueo: 200,
   desbloqueado: false,
   descripcion: "Las minas de La Arboleda son uno de los paisajes industriales más singulares de Bizkaia.",
-  imagen: ""
+  imagen: "https://www.eusko-ikaskuntza.eus/Imgs3digitala/12546.jpg"
 }
-
-
-
-
-
-
 
 ];
 
